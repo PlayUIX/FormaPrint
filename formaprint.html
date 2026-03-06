@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FormaPrint — Formulários Empresariais Prontos para Imprimir</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#0D1F4E;--accent:#2563EB;--accent2:#60a5fa;--gold:#F59E0B;--dark:#070f1e;--gray:#94A3B8;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:#fff;overflow-x:hidden;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;}
+
+/* ============ PROTECTION OVERLAY ============ */
+#protection-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#070f1e 0%,#0d1f4e 50%,#070f1e 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#protection-overlay.show{opacity:1;pointer-events:all;}
+.po-icon{width:90px;height:90px;background:linear-gradient(135deg,rgba(37,99,235,.2),rgba(37,99,235,.05));border:2px solid rgba(37,99,235,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:po-pulse 1s ease-in-out infinite;}
+@keyframes po-pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(37,99,235,.5);}50%{transform:scale(1.06);box-shadow:0 0 0 20px rgba(37,99,235,0);}}
+.po-title{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:4px;color:#fff;text-align:center;}
+.po-sub{color:var(--gray);font-size:1rem;text-align:center;max-width:400px;line-height:1.6;}
+.po-btn{background:var(--accent);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;padding:.8rem 2.2rem;border:none;border-radius:8px;cursor:pointer;margin-top:.5rem;}
+.po-badge{background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.35);color:var(--accent2);font-size:.72rem;letter-spacing:2px;padding:.3rem .9rem;border-radius:50px;display:flex;align-items:center;gap:.4rem;}
+
+/* ============ NAV ============ */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;background:rgba(7,15,30,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(37,99,235,0.15);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:4px;}
+.logo span{color:var(--accent);}
+.nav-btn{background:var(--accent);color:#fff;font-weight:700;font-size:0.82rem;letter-spacing:1.5px;text-transform:uppercase;padding:0.6rem 1.5rem;border:none;border-radius:6px;cursor:pointer;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:.5rem;}
+.nav-btn:hover{background:#1d4ed8;transform:translateY(-1px);box-shadow:0 8px 25px rgba(37,99,235,0.5);}
+
+/* ============ HERO ============ */
+.hero{min-height:100vh;display:flex;align-items:center;padding:8rem 2rem 5rem;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 60% 40%,rgba(37,99,235,0.13) 0%,transparent 65%),linear-gradient(160deg,#070f1e 0%,#0d1f4e 60%,#070f1e 100%);}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(37,99,235,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,0.05) 1px,transparent 1px);background-size:60px 60px;}
+.hero-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.1fr 0.9fr;gap:5rem;align-items:center;}
+@keyframes up{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.7);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.35);color:var(--accent2);font-size:.75rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;padding:.4rem 1rem;border-radius:50px;margin-bottom:1.5rem;animation:up .7s ease both;}
+.badge-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 1.8s infinite;}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,8vw,7rem);line-height:.92;letter-spacing:3px;margin-bottom:1.5rem;animation:up .7s .1s ease both;}
+h1 em{display:block;color:var(--accent);font-style:normal;}
+h1 small{display:block;font-size:50%;color:rgba(255,255,255,.4);letter-spacing:8px;}
+.sub{font-size:1.05rem;font-weight:300;color:var(--gray);line-height:1.8;margin-bottom:2.5rem;animation:up .7s .2s ease both;}
+.sub strong{color:#fff;font-weight:500;}
+.btns{display:flex;gap:1rem;flex-wrap:wrap;animation:up .7s .3s ease both;}
+.btn-main{background:var(--accent);color:#fff;font-weight:700;font-size:1rem;padding:1rem 2.2rem;border:none;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.6rem;transition:all .25s;box-shadow:0 0 40px rgba(37,99,235,.35);}
+.btn-main:hover{background:#1d4ed8;transform:translateY(-3px);box-shadow:0 0 60px rgba(37,99,235,.6);}
+.btn-ghost{background:transparent;color:#fff;font-weight:500;font-size:1rem;padding:1rem 2rem;border:1px solid rgba(255,255,255,.15);border-radius:8px;cursor:pointer;text-decoration:none;transition:all .25s;display:inline-flex;align-items:center;gap:.6rem;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent2);}
+
+/* SVG icon sizing */
+.icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.icon-sm svg{width:15px;height:15px;}
+.icon-lg svg{width:22px;height:22px;}
+.icon-xl svg{width:32px;height:32px;}
+.icon-2xl svg{width:48px;height:48px;}
+
+/* hero mockup */
+.hero-vis{animation:up .7s .4s ease both;}
+.mock{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6);}
+.mock-bar{background:rgba(37,99,235,.15);padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid rgba(255,255,255,.06);}
+.dots{display:flex;gap:5px;}
+.dot{width:9px;height:9px;border-radius:50%;}
+.dot.r{background:#FF5F57;}.dot.y{background:#FEBC2E;}.dot.g{background:#28C840;}
+.url{flex:1;background:rgba(255,255,255,.06);border-radius:4px;padding:.2rem .8rem;font-size:.68rem;color:var(--gray);margin-left:.5rem;}
+.mock-body{padding:1rem;}
+.mf{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5);animation:float 4s ease-in-out infinite;}
+.mfh{background:#0D1F4E;padding:.55rem .8rem;display:flex;justify-content:space-between;}
+.mfh-t{font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:1px;color:#fff;}
+.mfh-l{font-size:.55rem;color:rgba(255,255,255,.5);}
+.mfa{height:2px;background:linear-gradient(90deg,#2563EB,#60a5fa);}
+.mfi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:6px 8px;background:#f8faff;}
+.mfl{font-size:.44rem;font-weight:700;color:#0D1F4E;text-transform:uppercase;display:block;margin-bottom:2px;}
+.mfline{height:1px;background:#CBD5E1;}
+.mft{width:100%;border-collapse:collapse;}
+.mft th{background:#0D1F4E;color:#fff;font-size:.44rem;padding:3px 4px;text-align:center;font-family:'Bebas Neue',sans-serif;}
+.mft td{font-size:.4rem;padding:2.5px 4px;text-align:center;border-bottom:1px solid #EFF4FF;color:#94A3B8;}
+.mft tr:nth-child(even) td{background:#EFF4FF;}
+.mftf{background:#0D1F4E;padding:3px 8px;display:flex;justify-content:space-between;}
+.mftf span{font-size:.44rem;color:rgba(255,255,255,.6);}
+
+/* ============ STATS ============ */
+.stats{padding:3rem 2rem;background:rgba(37,99,235,.07);border-top:1px solid rgba(37,99,235,.15);border-bottom:1px solid rgba(37,99,235,.15);z-index:1;position:relative;}
+.stats-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-around;flex-wrap:wrap;gap:2rem;}
+.stat{text-align:center;}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:var(--accent);}
+.stat-l{font-size:.78rem;color:var(--gray);margin-top:.2rem;letter-spacing:1px;text-transform:uppercase;}
+
+/* ============ DEMO SECTION ============ */
+.demo-sec{padding:6rem 2rem;position:relative;z-index:1;}
+.demo-inner{max-width:1200px;margin:0 auto;}
+.sec-label{font-size:.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:2px;line-height:.95;margin-bottom:1rem;}
+.sec-sub{color:var(--gray);font-size:1rem;line-height:1.7;max-width:600px;margin-bottom:2.5rem;}
+
+.demo-alert{display:inline-flex;align-items:center;gap:.6rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);color:#F59E0B;font-size:.82rem;font-weight:500;padding:.5rem 1.2rem;border-radius:8px;margin-bottom:2rem;}
+
+/* form tabs */
+.stabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.stab{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--gray);font-size:.82rem;font-weight:500;padding:.55rem 1.1rem;border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.5rem;}
+.stab svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.stab:hover,.stab.active{background:rgba(37,99,235,.15);border-color:var(--accent);color:#fff;box-shadow:0 0 20px rgba(37,99,235,.25);}
+
+/* DEMO WRAPPER */
+.demo-wrapper{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;}
+.demo-topbar{background:rgba(37,99,235,.1);border-bottom:1px solid rgba(37,99,235,.2);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+.demo-topbar-l{display:flex;align-items:center;gap:.8rem;}
+.demo-live-dot{width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s infinite;}
+.demo-topbar-text{font-size:.82rem;color:var(--accent2);font-weight:500;}
+.demo-topbar-r{font-size:.75rem;color:var(--gray);display:flex;align-items:center;gap:.4rem;}
+.demo-topbar-r svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+.demo-body{padding:2rem;}
+.fshow{display:none;}
+.fshow.active{display:block;}
+
+/* ============ INTERACTIVE FORM ============ */
+.iform{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative;}
+
+/* FORM HEADER */
+.ifh{background:#0D1F4E;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;}
+.ifh-t{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:#fff;}
+.ifh-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.ifh-logo{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:#fff;letter-spacing:2px;}
+.ifh-logo span{color:#60a5fa;}
+.ifh-sub{font-size:.6rem;color:rgba(255,255,255,.5);}
+.ifa{height:3px;background:linear-gradient(90deg,#2563EB,#60a5fa);}
+
+/* FORM FIELDS */
+.if-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px 16px;background:#f0f4ff;border-bottom:1px solid #e2e8f0;}
+.if-field{display:flex;flex-direction:column;gap:4px;}
+.if-label{font-size:.6rem;font-weight:700;color:#0D1F4E;letter-spacing:.8px;text-transform:uppercase;}
+.if-input{border:none;border-bottom:1.5px solid #CBD5E1;background:transparent;font-size:.8rem;color:#1E293B;padding:2px 0;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;width:100%;-webkit-user-select:text;user-select:text;}
+.if-input:focus{border-bottom-color:#2563EB;}
+.if-input::placeholder{color:#CBD5E1;}
+
+/* TABLE */
+.ift-wrap{overflow-x:auto;}
+.ift{width:100%;border-collapse:collapse;}
+.ift th{background:#0D1F4E;color:#fff;font-size:.65rem;padding:7px 8px;text-align:center;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;white-space:nowrap;}
+.ift td{padding:0;border-bottom:1px solid #EFF4FF;}
+.ift tr:nth-child(even) td{background:#f8faff;}
+.ift tr:nth-child(odd) td{background:#fff;}
+.ift td:first-child{font-size:.65rem;color:#2563EB;font-weight:700;text-align:center;padding:4px 6px;min-width:28px;}
+.cell-input{width:100%;border:none;background:transparent;font-size:.75rem;color:#1E293B;padding:5px 7px;outline:none;font-family:'DM Sans',sans-serif;text-align:center;-webkit-user-select:text;user-select:text;}
+.cell-input:focus{background:rgba(37,99,235,.05);}
+
+/* TOTALS */
+.if-totals{background:#0D1F4E;padding:6px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;}
+.if-totals span{font-size:.65rem;color:rgba(255,255,255,.8);}
+.if-totals strong{color:#60a5fa;}
+
+/* SIGNATURES */
+.if-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:10px 16px;background:#f8faff;border-top:1px solid #e2e8f0;}
+.if-sig{display:flex;flex-direction:column;gap:4px;align-items:center;}
+.if-sig-line{width:100%;height:1px;background:#CBD5E1;}
+.if-sig-label{font-size:.55rem;color:#94A3B8;text-align:center;}
+
+/* FORM FOOTER */
+.if-footer{background:#0D1F4E;padding:5px 16px;display:flex;justify-content:space-between;}
+.if-footer span{font-size:.58rem;color:rgba(255,255,255,.6);}
+
+/* below demo CTA */
+.demo-cta{text-align:center;padding:2rem;border-top:1px solid rgba(255,255,255,.06);background:rgba(37,99,235,.05);}
+.demo-cta p{color:var(--gray);font-size:.9rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:.5rem;}
+.demo-cta p svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============ PRICING ============ */
+.price-sec{padding:6rem 2rem;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(37,99,235,.09) 0%,transparent 70%);position:relative;z-index:1;text-align:center;}
+.price-card{background:linear-gradient(145deg,rgba(13,31,78,.95),rgba(21,42,110,.95));border:1px solid rgba(37,99,235,.45);border-radius:24px;padding:3rem;max-width:520px;margin:0 auto;position:relative;overflow:hidden;box-shadow:0 0 100px rgba(37,99,235,.2),inset 0 1px 0 rgba(255,255,255,.08);}
+.price-card::before{content:'OFERTA ESPECIAL';position:absolute;top:1.8rem;right:-2.5rem;background:var(--gold);color:#000;font-weight:800;font-size:.65rem;letter-spacing:2px;padding:.35rem 3.5rem;transform:rotate(45deg);}
+.old-p{font-size:1rem;color:var(--gray);text-decoration:line-through;margin-bottom:.3rem;}
+.price{font-family:'Bebas Neue',sans-serif;font-size:6rem;line-height:1;color:#fff;}
+.price sup{font-size:2rem;vertical-align:top;margin-top:1.2rem;display:inline-block;}
+.price-note{color:var(--gray);font-size:.9rem;margin-bottom:2rem;}
+.features{list-style:none;margin-bottom:2.5rem;text-align:left;}
+.features li{display:flex;align-items:center;gap:.8rem;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.93rem;}
+.features li .feat-icon{width:21px;height:21px;min-width:21px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.features li .feat-icon svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.buy-btn{display:flex;width:100%;align-items:center;justify-content:center;gap:.7rem;background:linear-gradient(135deg,#2563EB,#1d4ed8);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;padding:1.1rem;border:none;border-radius:10px;cursor:pointer;text-decoration:none;text-align:center;transition:all .25s;box-shadow:0 10px 40px rgba(37,99,235,.5);margin-bottom:1rem;}
+.buy-btn:hover{transform:translateY(-3px);box-shadow:0 15px 50px rgba(37,99,235,.7);}
+.buy-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.secure{display:flex;align-items:center;justify-content:center;gap:.4rem;color:var(--gray);font-size:.8rem;}
+.secure svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ============ TRUST ============ */
+.trust{padding:2rem;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05);position:relative;z-index:1;}
+.trust-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:2.5rem;}
+.ti{color:var(--gray);font-size:.85rem;display:flex;align-items:center;gap:.5rem;}
+.ti svg{width:16px;height:16px;stroke:var(--accent2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+footer{padding:3rem 2rem;border-top:1px solid rgba(255,255,255,.05);text-align:center;position:relative;z-index:1;}
+.flogo{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;margin-bottom:.4rem;}
+.flogo span{color:var(--accent);}
+footer p{color:var(--gray);font-size:.82rem;}
+
+/* user-select blocked on form visuals */
+.iform *{-webkit-user-select:none;user-select:none;}
+.if-input,.cell-input{-webkit-user-select:text!important;user-select:text!important;}
+
+/* ============ ANTI-PRINT CSS ============ */
+@media print{
+  body::before{
+    content:'';
+    position:fixed;inset:0;
+    background:#070f1e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='48' fill='%232563EB' fill-opacity='0.3' text-anchor='middle' dominant-baseline='middle' transform='rotate(-35,200,200)'%3EPROTEGIDO • FORMAPRINT%3C/text%3E%3C/text%3E%3C/svg%3E") center/400px;
+    z-index:999999;
+    display:block!important;
+  }
+  body > *:not(#print-block){display:none!important;}
+  #print-block{
+    display:flex!important;
+    position:fixed;inset:0;
+    align-items:center;justify-content:center;flex-direction:column;gap:1rem;
+    background:#070f1e;color:#fff;font-family:Arial,sans-serif;text-align:center;z-index:999999;
+  }
+}
+#print-block{display:none;}
+
+@media(max-width:900px){.hero-inner{grid-template-columns:1fr;}.hero-vis{display:none;}.if-info{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<!-- oncontextmenu bloqueado via JS abaixo, mais robusto -->
+<body>
+
+<!-- ============ PROTECTION OVERLAY ============ -->
+<div id="protection-overlay">
+  <div class="po-icon">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  </div>
+  <div class="po-badge">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    CONTEÚDO PROTEGIDO
+  </div>
+  <div class="po-title" id="po-title">ACESSO NEGADO</div>
+  <div class="po-sub" id="po-sub">Este conteúdo é protegido por direitos autorais. Para ter acesso completo, adquira o pack FormaPrint.</div>
+  <button class="po-btn" onclick="closeOverlay()">ENTENDIDO — FECHAR</button>
+</div>
+
+<!-- Print block element -->
+<div id="print-block">
+  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;">CONTEÚDO PROTEGIDO</div>
+  <div style="color:#94A3B8;font-size:1rem;">FormaPrint — Todos os direitos reservados</div>
+  <div style="color:#60a5fa;font-size:.9rem;margin-top:.5rem;">Para adquirir o pack completo acesse: formaprint.com.br</div>
+</div>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="logo">Forma<span>Print</span></div>
+  <a href="https://pay.kiwify.com.br/ErzAV9u" class="nav-btn" target="_blank">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Comprar Agora
+  </a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Entrega imediata após o pagamento
+      </div>
+      <h1><small>Pack Completo</small>FORMULÁRIOS<em>EMPRESARIAIS</em></h1>
+      <p class="sub"><strong>6 PDFs profissionais</strong> prontos para imprimir.<br/>Layout limpo, economiza tinta e fica perfeito na impressão.<br/>Ideal para <strong>MEI, comércios, salões, oficinas e restaurantes.</strong></p>
+      <div class="btns">
+        <a href="https://pay.kiwify.com.br/ErzAV9u" class="btn-main" target="_blank">
+          <span class="icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
+          Quero Meu Pack — R$ 29,90
+        </a>
+        <a href="#demo" class="btn-ghost">
+          Testar formulários
+          <span class="icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-vis">
+      <div class="mock">
+        <div class="mock-bar">
+          <div class="dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
+          <div class="url">formaprint.com.br • Formulários Empresariais</div>
+        </div>
+        <div class="mock-body">
+          <div class="mf">
+            <div class="mfh"><span class="mfh-t">CONTROLE DE ESTOQUE</span><span class="mfh-l">FormaPrint</span></div>
+            <div class="mfa"></div>
+            <div class="mfi">
+              <div><span class="mfl">EMPRESA</span><div class="mfline"></div></div>
+              <div><span class="mfl">RESPONSÁVEL</span><div class="mfline"></div></div>
+              <div><span class="mfl">PERÍODO</span><div class="mfline"></div></div>
+            </div>
+            <table class="mft">
+              <tr><th>Nº</th><th>DATA</th><th>PRODUTO</th><th>ENTRADA</th><th>SAÍDA</th><th>TOTAL</th></tr>
+              <tr><td>1</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>2</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>3</td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td>4</td><td></td><td></td><td></td><td></td><td></td></tr>
+            </table>
+            <div class="mftf"><span>FormaPrint</span><span>Pg 1/1</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-n">6</div><div class="stat-l">PDFs Inclusos</div></div>
+    <div class="stat"><div class="stat-n">A4</div><div class="stat-l">Formato Padrão</div></div>
+    <div class="stat"><div class="stat-n">100%</div><div class="stat-l">Pronto pra Imprimir</div></div>
+    <div class="stat"><div class="stat-n">R$29</div><div class="stat-l">Pack Completo</div></div>
+  </div>
+</div>
+
+<!-- ============ DEMO SECTION ============ -->
+<section class="demo-sec" id="demo">
+  <div class="demo-inner">
+    <div class="sec-label">Teste Agora Mesmo</div>
+    <h2 class="sec-title">EXPERIMENTE OS<br/>FORMULÁRIOS</h2>
+    <p class="sec-sub">Preencha os campos abaixo e veja exatamente como cada formulário funciona. A versão completa é só comprar!</p>
+    <div class="demo-alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Versão demonstração — protegida. Compre para ter o PDF completo sem restrições.
+    </div>
+
+    <div class="stabs">
+      <div class="stab active" onclick="showForm(0)">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Controle de Estoque
+      </div>
+      <div class="stab" onclick="showForm(1)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Folha de Ponto
+      </div>
+      <div class="stab" onclick="showForm(2)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        Ordem de Serviço
+      </div>
+      <div class="stab" onclick="showForm(3)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Recibo
+      </div>
+      <div class="stab" onclick="showForm(4)">
+        <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Checklist
+      </div>
+      <div class="stab" onclick="showForm(5)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Ficha de Cliente
+      </div>
+    </div>
+
+    <div class="demo-wrapper">
+      <div class="demo-topbar">
+        <div class="demo-topbar-l">
+          <div class="demo-live-dot"></div>
+          <span class="demo-topbar-text">Demonstração interativa — preencha os campos</span>
+        </div>
+        <span class="demo-topbar-r">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Versão demonstração protegida
+        </span>
+      </div>
+      <div class="demo-body">
+
+        <!-- FORM 1: ESTOQUE -->
+        <div class="fshow active" id="f0">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">CONTROLE DE ESTOQUE</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Formulários Profissionais</span></div>
+            </div>
+            <div class="ifa"></div>
+            <div class="if-info">
+              <div class="if-field"><label class="if-label">EMPRESA / ESTABELECIMENTO</label><input class="if-input" placeholder="Nome da empresa..."/></div>
+              <div class="if-field"><label class="if-label">RESPONSÁVEL</label><input class="if-input" placeholder="Seu nome..."/></div>
+              <div class="if-field"><label class="if-label">PERÍODO</label><input class="if-input" placeholder="Mês/Ano..."/></div>
+            </div>
+            <div class="ift-wrap">
+              <table class="ift">
+                <tr><th>Nº</th><th>DATA</th><th>PRODUTO / DESCRIÇÃO</th><th>ENTRADA (Qtd)</th><th>SAÍDA (Qtd)</th><th>ESTOQUE ATUAL</th><th>OBSERVAÇÃO</th></tr>
+                ${Array.from({length:8},(_,i)=>`<tr><td>${i+1}</td><td><input class="cell-input" placeholder="dd/mm"/></td><td><input class="cell-input" style="text-align:left" placeholder="Nome do produto..."/></td><td><input class="cell-input" placeholder="0"/></td><td><input class="cell-input" placeholder="0"/></td><td><input class="cell-input" placeholder="0"/></td><td><input class="cell-input" style="text-align:left" placeholder="..."/></td></tr>`).join('')}
+              </table>
+            </div>
+            <div class="if-totals"><span>TOTAIS DO PERÍODO:</span><span>Entradas: <strong id="tot-e">0</strong></span><span>Saídas: <strong id="tot-s">0</strong></span></div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Responsável / Data</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Aprovado por / Data</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Gerente / Supervisor</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+        <!-- FORM 2: PONTO -->
+        <div class="fshow" id="f1">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">FOLHA DE PONTO</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Formulários Profissionais</span></div>
+            </div>
+            <div class="ifa"></div>
+            <div class="if-info">
+              <div class="if-field"><label class="if-label">FUNCIONÁRIO</label><input class="if-input" placeholder="Nome do funcionário..."/></div>
+              <div class="if-field"><label class="if-label">CARGO / FUNÇÃO</label><input class="if-input" placeholder="Ex: Vendedor..."/></div>
+              <div class="if-field"><label class="if-label">MÊS / ANO</label><input class="if-input" placeholder="Ex: Março/2026..."/></div>
+            </div>
+            <div class="ift-wrap">
+              <table class="ift">
+                <tr><th>Nº</th><th>DIA</th><th>DIA SEM.</th><th>ENTRADA</th><th>SAÍDA ALM.</th><th>RETORNO</th><th>SAÍDA</th><th>TOTAL HS</th></tr>
+                ${Array.from({length:8},(_,i)=>{const dias=['Seg','Ter','Qua','Qui','Sex','Sáb','Dom','Seg'];return`<tr><td>${i+1}</td><td><input class="cell-input" placeholder="${String(i+1).padStart(2,'0')}"/></td><td><input class="cell-input" placeholder="${dias[i]}"/></td><td><input class="cell-input" placeholder="08:00"/></td><td><input class="cell-input" placeholder="12:00"/></td><td><input class="cell-input" placeholder="13:00"/></td><td><input class="cell-input" placeholder="17:00"/></td><td><input class="cell-input" placeholder="8h"/></td></tr>`}).join('')}
+              </table>
+            </div>
+            <div class="if-totals"><span>TOTAL DO MÊS:</span><span>Horas Trabalhadas: <strong>______</strong></span><span>Horas Extras: <strong>______</strong></span></div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Assinatura do Funcionário</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Supervisor / Gerente</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">RH / Data</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+        <!-- FORM 3: OS -->
+        <div class="fshow" id="f2">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">ORDEM DE SERVIÇO</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Formulários Profissionais</span></div>
+            </div>
+            <div class="ifa"></div>
+            <div class="if-info">
+              <div class="if-field"><label class="if-label">Nº DA OS</label><input class="if-input" placeholder="OS-001"/></div>
+              <div class="if-field"><label class="if-label">DATA DE ABERTURA</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+              <div class="if-field"><label class="if-label">PREVISÃO ENTREGA</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+            </div>
+            <div style="padding:10px 16px;background:#f0f4ff;border-bottom:1px solid #e2e8f0;">
+              <div style="font-size:.6rem;font-weight:700;color:#2563EB;letter-spacing:1px;margin-bottom:8px;">▶ DADOS DO CLIENTE</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div class="if-field"><label class="if-label">NOME / RAZÃO SOCIAL</label><input class="if-input" placeholder="Nome do cliente..."/></div>
+                <div class="if-field"><label class="if-label">TELEFONE / WHATSAPP</label><input class="if-input" placeholder="(00) 00000-0000"/></div>
+                <div class="if-field"><label class="if-label">ENDEREÇO</label><input class="if-input" placeholder="Rua, número..."/></div>
+                <div class="if-field"><label class="if-label">CPF / CNPJ</label><input class="if-input" placeholder="000.000.000-00"/></div>
+              </div>
+            </div>
+            <div class="ift-wrap">
+              <table class="ift">
+                <tr><th>Nº</th><th>DESCRIÇÃO DO SERVIÇO / PEÇA</th><th>QTD</th><th>VALOR UNIT.</th><th>VALOR TOTAL</th></tr>
+                ${Array.from({length:5},(_,i)=>`<tr><td>${i+1}</td><td><input class="cell-input" style="text-align:left" placeholder="Descreva o serviço ou peça..."/></td><td><input class="cell-input" placeholder="1"/></td><td><input class="cell-input" placeholder="R$ 0,00"/></td><td><input class="cell-input" placeholder="R$ 0,00"/></td></tr>`).join('')}
+              </table>
+            </div>
+            <div class="if-totals"><span>RESUMO:</span><span>Mão de Obra: <strong>R$ ______</strong></span><span>TOTAL GERAL: <strong>R$ ______</strong></span></div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Técnico / Data</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Cliente / Data</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Autorização</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+        <!-- FORM 4: RECIBO -->
+        <div class="fshow" id="f3">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">RECIBO DE PAGAMENTO</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Nº: <input class="if-input" style="width:60px;color:#fff;border-bottom-color:rgba(255,255,255,.3)" placeholder="001"/></span></div>
+            </div>
+            <div class="ifa"></div>
+            <div style="padding:16px;background:#f8faff;display:flex;flex-direction:column;gap:12px;">
+              <div class="if-field"><label class="if-label">RECEBI DE:</label><input class="if-input" placeholder="Nome de quem pagou..."/></div>
+              <div style="display:flex;align-items:center;gap:1rem;">
+                <div class="if-field" style="flex:1"><label class="if-label">A QUANTIA DE R$:</label><input class="if-input" placeholder="0,00"/></div>
+                <div style="background:#0D1F4E;border-radius:8px;padding:.6rem 1.2rem;text-align:center;min-width:120px;">
+                  <div style="font-size:.55rem;color:rgba(255,255,255,.5);margin-bottom:2px;">VALOR</div>
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#fff;letter-spacing:1px;">R$ ______</div>
+                </div>
+              </div>
+              <div class="if-field"><label class="if-label">REFERENTE A:</label><input class="if-input" placeholder="Descrição do serviço ou produto..."/></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="if-field"><label class="if-label">FORMA DE PAGAMENTO</label><input class="if-input" placeholder="Pix / Cartão / Dinheiro..."/></div>
+                <div class="if-field"><label class="if-label">DATA DO PAGAMENTO</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+              </div>
+            </div>
+            <div style="border-top:2px dashed #CBD5E1;margin:0 16px;padding:4px 0;text-align:center;font-size:.55rem;color:#94A3B8;background:#fff;">✂ Destacar aqui — 2 recibos por folha A4</div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Assinatura de Quem Recebeu</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Local e Data</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Testemunha (opcional)</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+        <!-- FORM 5: CHECKLIST -->
+        <div class="fshow" id="f4">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">CHECKLIST DE ABERTURA E FECHAMENTO</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Formulários Profissionais</span></div>
+            </div>
+            <div class="ifa"></div>
+            <div class="if-info">
+              <div class="if-field"><label class="if-label">ESTABELECIMENTO</label><input class="if-input" placeholder="Nome do negócio..."/></div>
+              <div class="if-field"><label class="if-label">RESPONSÁVEL</label><input class="if-input" placeholder="Seu nome..."/></div>
+              <div class="if-field"><label class="if-label">DATA</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:12px 16px;background:#f8faff;border-bottom:1px solid #e2e8f0;">
+              <div style="padding-right:16px;">
+                <div style="font-size:.65rem;font-weight:700;color:#2563EB;margin-bottom:10px;letter-spacing:1px;">▶ ABERTURA</div>
+                ${['Abrir caixa e conferir troco','Ligar equipamentos e sistemas','Verificar estoque do dia','Limpeza e organização','Conferir produtos / validades','Testar iluminação','Verificar câmeras / segurança','Abrir portões e portas','Checar Wi-Fi e comunicação','Revisar agenda do dia'].map(item=>`
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
+                  <input type="checkbox" style="width:14px;height:14px;accent-color:#2563EB;cursor:pointer;-webkit-user-select:auto;user-select:auto;"/>
+                  <span style="font-size:.78rem;color:#1E293B;">${item}</span>
+                </label>`).join('')}
+              </div>
+              <div style="border-left:1px solid #e2e8f0;padding-left:16px;">
+                <div style="font-size:.65rem;font-weight:700;color:#2563EB;margin-bottom:10px;letter-spacing:1px;">▶ FECHAMENTO</div>
+                ${['Fechar caixa e conferir valores','Desligar equipamentos','Conferir estoque final','Limpeza geral do espaço','Guardar mercadorias','Verificar janelas e portas','Ativar alarme de segurança','Fazer backup / fechar sistemas','Registrar ocorrências do dia','Assinar e arquivar checklist'].map(item=>`
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
+                  <input type="checkbox" style="width:14px;height:14px;accent-color:#2563EB;cursor:pointer;-webkit-user-select:auto;user-select:auto;"/>
+                  <span style="font-size:.78rem;color:#1E293B;">${item}</span>
+                </label>`).join('')}
+              </div>
+            </div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Responsável Abertura / Hora</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Responsável Fechamento / Hora</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Supervisor / Data</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+        <!-- FORM 6: CLIENTE -->
+        <div class="fshow" id="f5">
+          <div class="iform">
+            <div class="ifh">
+              <span class="ifh-t">FICHA DE CADASTRO DE CLIENTE</span>
+              <div class="ifh-r"><span class="ifh-logo">Forma<span>Print</span></span><span class="ifh-sub">Formulários Profissionais</span></div>
+            </div>
+            <div class="ifa"></div>
+            <div class="if-info">
+              <div class="if-field"><label class="if-label">DATA DO CADASTRO</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+              <div class="if-field"><label class="if-label">ATENDENTE</label><input class="if-input" placeholder="Seu nome..."/></div>
+              <div class="if-field"><label class="if-label">Nº DO CADASTRO</label><input class="if-input" placeholder="001"/></div>
+            </div>
+            <div style="padding:12px 16px;background:#f8faff;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;">
+                <div class="if-field"><label class="if-label">NOME COMPLETO</label><input class="if-input" placeholder="Nome do cliente..."/></div>
+                <div class="if-field"><label class="if-label">DATA DE NASCIMENTO</label><input class="if-input" placeholder="dd/mm/aaaa"/></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div class="if-field"><label class="if-label">CPF</label><input class="if-input" placeholder="000.000.000-00"/></div>
+                <div class="if-field"><label class="if-label">TELEFONE</label><input class="if-input" placeholder="(00) 00000-0000"/></div>
+                <div class="if-field"><label class="if-label">E-MAIL</label><input class="if-input" placeholder="email@..."/></div>
+              </div>
+              <div class="if-field"><label class="if-label">ENDEREÇO COMPLETO</label><input class="if-input" placeholder="Rua, número, complemento..."/></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+                <div class="if-field"><label class="if-label">BAIRRO</label><input class="if-input" placeholder="..."/></div>
+                <div class="if-field"><label class="if-label">CIDADE</label><input class="if-input" placeholder="..."/></div>
+                <div class="if-field"><label class="if-label">CEP</label><input class="if-input" placeholder="00000-000"/></div>
+              </div>
+            </div>
+            <div class="ift-wrap">
+              <table class="ift">
+                <tr><th>DATA</th><th>SERVIÇO / PRODUTO</th><th>VALOR (R$)</th><th>FORMA PAGTO</th><th>OBSERVAÇÃO</th></tr>
+                ${Array.from({length:3},()=>`<tr><td style="padding:0"><input class="cell-input" placeholder="dd/mm"/></td><td><input class="cell-input" style="text-align:left" placeholder="..."/></td><td><input class="cell-input" placeholder="R$ 0,00"/></td><td><input class="cell-input" placeholder="Pix"/></td><td><input class="cell-input" style="text-align:left" placeholder="..."/></td></tr>`).join('')}
+              </table>
+            </div>
+            <div class="if-sigs">
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Assinatura do Cliente</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Responsável pelo Cadastro</span></div>
+              <div class="if-sig"><div class="if-sig-line"></div><span class="if-sig-label">Data</span></div>
+            </div>
+            <div class="if-footer"><span>FormaPrint — Formulários Profissionais para Impressão</span><span>DEMO | Pg 1/1</span></div>
+          </div>
+        </div>
+
+      </div><!-- demo-body -->
+
+      <div class="demo-cta">
+        <p>
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Gostou? A versão completa sem restrições é só comprar!
+        </p>
+        <a href="https://pay.kiwify.com.br/ErzAV9u" class="btn-main" target="_blank" style="display:inline-flex;">
+          <span class="icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
+          Comprar Pack Completo — R$ 29,90
+        </a>
+      </div>
+    </div><!-- demo-wrapper -->
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="price-sec" id="comprar">
+  <div class="sec-label" style="display:block;margin-bottom:.6rem;">Oferta Especial</div>
+  <h2 class="sec-title" style="margin-bottom:3rem;">PACK COMPLETO<br/>FORMAPRINT</h2>
+  <div class="price-card">
+    <div class="old-p">De R$ 79,90</div>
+    <div class="price"><sup>R$</sup>29<span style="font-size:3rem">,90</span></div>
+    <div class="price-note">pagamento único • download imediato</div>
+    <ul class="features">
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Controle de Estoque — 22 linhas</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Folha de Ponto — 31 dias completos</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Ordem de Serviço Profissional</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Recibo — 2 por folha</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Checklist Abertura e Fechamento</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Ficha de Cadastro de Cliente</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Download imediato após pagamento</li>
+      <li><span class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>Sem restrições — PDF limpo e completo</li>
+    </ul>
+    <a href="https://pay.kiwify.com.br/ErzAV9u" class="buy-btn" target="_blank">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      COMPRAR AGORA — R$ 29,90
+    </a>
+    <div class="secure">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Pagamento 100% seguro via Kiwify
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST ============ -->
+<div class="trust">
+  <div class="trust-inner">
+    <div class="ti">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Pagamento Seguro
+    </div>
+    <div class="ti">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Entrega Imediata
+    </div>
+    <div class="ti">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pix · Cartão · Boleto
+    </div>
+    <div class="ti">
+      <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Pronto pra Imprimir
+    </div>
+    <div class="ti">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Suporte WhatsApp
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="flogo">Forma<span>Print</span></div>
+  <p>Formulários Profissionais para Impressão</p>
+</footer>
+
+<!-- ============ SCRIPTS ============ -->
+<script>
+// ============================
+//  FORM TABS
+// ============================
+function showForm(i){
+  document.querySelectorAll('.fshow').forEach((el,idx)=>el.classList.toggle('active',idx===i));
+  document.querySelectorAll('.stab').forEach((el,idx)=>el.classList.toggle('active',idx===i));
+}
+
+// ============================
+//  SMOOTH SCROLL
+// ============================
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+
+// ============================
+//  PROTECTION ENGINE
+// ============================
+const overlay = document.getElementById('protection-overlay');
+const poTitle = document.getElementById('po-title');
+const poSub   = document.getElementById('po-sub');
+
+const MSGS = [
+  {t:'NÃO TÃO RÁPIDO!',       s:'Conteúdo protegido por direitos autorais. Adquira o FormaPrint para ter acesso completo aos formulários.'},
+  {t:'EI, PARA AÍ!',          s:'Esse conteúdo é nosso. Sem tentar copiar! Clique em Comprar e tenha tudo de forma legal.'},
+  {t:'PROTEGIDO!',             s:'Você tentou uma ação bloqueada. FormaPrint é obra intelectual protegida. Compre e use à vontade!'},
+  {t:'ACESSO NEGADO',          s:'Esta ação não é permitida na versão de demonstração. Adquira o pack completo em formaprint.com.br'},
+  {t:'QUASE LÁ, MAS NÃO!',    s:'Você estava tentando roubar né? Sabemos. Compre o pack e use sem restrições!'},
+];
+
+let msgIdx = 0;
+function showProtection(type){
+  const m = MSGS[msgIdx % MSGS.length];
+  msgIdx++;
+  poTitle.textContent = m.t;
+  poSub.textContent   = m.s;
+  overlay.classList.add('show');
+}
+function closeOverlay(){
+  overlay.classList.remove('show');
+}
+
+// Block right-click
+document.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  showProtection('rightclick');
+  return false;
+});
+
+// Block keyboard shortcuts
+document.addEventListener('keydown',e=>{
+  const key = e.key.toLowerCase();
+  const ctrl = e.ctrlKey || e.metaKey;
+
+  // Ctrl+P, Ctrl+S, Ctrl+U (view source), Ctrl+A (select all), Ctrl+C only on non-input
+  if(ctrl && ['p','s','u','j'].includes(key)){
+    e.preventDefault();
+    showProtection('shortcut');
+    return false;
+  }
+
+  // F12 / DevTools
+  if(e.key === 'F12'){
+    e.preventDefault();
+    showProtection('devtools');
+    return false;
+  }
+
+  // PrintScreen
+  if(e.key === 'PrintScreen'){
+    e.preventDefault();
+    showProtection('printscreen');
+    // black the screen briefly
+    document.body.style.filter='blur(30px) brightness(0)';
+    setTimeout(()=>document.body.style.filter='',800);
+    return false;
+  }
+
+  // Ctrl+Shift+I/J/C/K (DevTools)
+  if(ctrl && e.shiftKey && ['i','j','c','k'].includes(key)){
+    e.preventDefault();
+    showProtection('devtools');
+    return false;
+  }
+});
+
+// Block print via media
+window.addEventListener('beforeprint',e=>{
+  e.preventDefault();
+  showProtection('print');
+  return false;
+});
+
+// Block drag
+document.addEventListener('dragstart',e=>{
+  if(!e.target.matches('input,textarea')){
+    e.preventDefault();
+  }
+});
+
+// DevTools detection (size change trick)
+(function devToolsDetect(){
+  const threshold = 160;
+  let devOpen = false;
+  setInterval(()=>{
+    const w = window.outerWidth - window.innerWidth;
+    const h = window.outerHeight - window.innerHeight;
+    if((w > threshold || h > threshold) && !devOpen){
+      devOpen = true;
+      showProtection('devtools');
+    } else if(w <= threshold && h <= threshold){
+      devOpen = false;
+    }
+  }, 1200);
+})();
+
+// Screenshot detection via visibility (mobile / tab switch)
+let blurCount = 0;
+window.addEventListener('blur',()=>{
+  blurCount++;
+  if(blurCount > 1){
+    // gentle protection on repeated focus loss
+    document.querySelectorAll('.iform').forEach(f=>{
+      f.style.filter='blur(8px)';
+    });
+  }
+});
+window.addEventListener('focus',()=>{
+  document.querySelectorAll('.iform').forEach(f=>{
+    f.style.filter='';
+  });
+});
+
+// Disable text selection on form visuals (allow on inputs)
+document.addEventListener('selectstart',e=>{
+  if(!e.target.matches('input,textarea')){
+    e.preventDefault();
+  }
+});
+</script>
+</body>
+</html>

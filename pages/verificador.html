@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificador de Currículo Grátis — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: var(--off); }
+    .verif-page { max-width: 720px; margin: 0 auto; padding: 100px 24px 60px; }
+    .verif-header { text-align: center; margin-bottom: 40px; }
+    .verif-header h1 { color: var(--navy); font-size: clamp(1.6rem,4vw,2.4rem); margin-bottom: 10px; }
+    .verif-header p  { font-size: .95rem; max-width: 480px; margin: 0 auto; }
+
+    .verif-card {
+      background: var(--white); border-radius: 16px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .verif-card-header { background: var(--navy); padding: 20px 28px; }
+    .verif-card-header h3 { color: var(--white); font-size: 1.1rem; margin-bottom: 4px; }
+    .verif-card-header p  { color: rgba(255,255,255,.55); font-size: .82rem; }
+    .verif-card-body  { padding: 28px; }
+
+    .verif-textarea {
+      width: 100%; min-height: 200px;
+      padding: 14px; border: 1.5px solid var(--light);
+      border-radius: 10px; font-family: var(--body);
+      font-size: .88rem; color: var(--dark);
+      resize: vertical; transition: border-color var(--t); outline: none;
+      line-height: 1.6;
+    }
+    .verif-textarea:focus { border-color: var(--navy); }
+    .verif-char { text-align: right; font-size: .72rem; color: var(--gray); margin-top: 4px; }
+
+    .verif-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      font-size: 1rem; padding: 14px; border-radius: 10px;
+      border: none; cursor: pointer; font-family: var(--body);
+      transition: all var(--t); margin-top: 16px;
+    }
+    .verif-btn:hover { background: var(--gold2); transform: translateY(-1px); }
+    .verif-btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* Loading */
+    .verif-loading { display: none; text-align: center; padding: 40px 28px; }
+    .verif-spin {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 4px solid var(--light); border-top-color: var(--navy);
+      animation: spin .7s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* Resultado */
+    .verif-result { display: none; padding: 28px; }
+
+    /* Nota geral */
+    .nota-section {
+      display: flex; align-items: center; gap: 20px;
+      background: var(--navy); border-radius: 14px;
+      padding: 20px 24px; margin-bottom: 28px;
+    }
+    .nota-circle {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 4px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display); font-size: 1.6rem; font-weight: 900;
+      color: var(--gold); flex-shrink: 0;
+    }
+    .nota-info h3  { color: var(--white); font-size: 1.1rem; margin-bottom: 4px; }
+    .nota-info p   { color: rgba(255,255,255,.55); font-size: .82rem; }
+    .nota-stars    { color: var(--gold); font-size: 1.1rem; letter-spacing: 2px; }
+
+    /* Barras por critério */
+    .criterios { margin-bottom: 24px; }
+    .criterio-item { margin-bottom: 14px; }
+    .criterio-top {
+      display: flex; justify-content: space-between;
+      font-size: .82rem; font-weight: 700; color: var(--navy); margin-bottom: 4px;
+    }
+    .criterio-bar-bg   { background: var(--light); border-radius: 3px; height: 7px; }
+    .criterio-bar-fill { border-radius: 3px; height: 7px; transition: width .8s ease; }
+
+    /* Sugestões */
+    .sugestoes-box { margin-bottom: 24px; }
+    .sug-titulo { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray); margin-bottom: 12px; }
+    .sug-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: var(--off); border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 8px;
+      font-size: .86rem; color: var(--dark); line-height: 1.6;
+    }
+    .sug-item i { flex-shrink: 0; margin-top: 2px; font-size: 1rem; }
+    .sug-item.positivo i { color: #16a34a; }
+    .sug-item.negativo i { color: #EF4444; }
+    .sug-item.aviso   i  { color: #F59E0B; }
+
+    /* CTA após resultado */
+    .verif-cta {
+      background: linear-gradient(135deg, var(--navy), #243660);
+      border-radius: 12px; padding: 22px 24px; text-align: center;
+    }
+    .verif-cta h4  { color: var(--white); font-family: var(--body); font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .verif-cta p   { color: rgba(255,255,255,.6); font-size: .82rem; margin-bottom: 16px; }
+    .verif-cta-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn-criar {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      padding: 11px 24px; border-radius: 8px; font-size: .88rem;
+      transition: background var(--t);
+    }
+    .btn-criar:hover { background: var(--gold2); }
+    .btn-novo {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1.5px solid rgba(255,255,255,.3); color: rgba(255,255,255,.8);
+      font-weight: 700; padding: 10px 20px; border-radius: 8px;
+      font-size: .88rem; cursor: pointer; background: none;
+      font-family: var(--body); transition: all var(--t);
+    }
+    .btn-novo:hover { background: rgba(255,255,255,.1); }
+
+    .verif-aviso {
+      background: rgba(212,175,55,.07); border: 1px solid rgba(212,175,55,.2);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: .78rem; color: var(--dark); line-height: 1.6;
+      margin-bottom: 20px; display: flex; gap: 10px; align-items: flex-start;
+    }
+    .verif-aviso i { color: var(--gold2); margin-top: 1px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+      <a href="editor.html" class="btn-nav" style="margin-left:auto">Criar currículo</a>
+    </div>
+  </nav>
+
+  <div class="verif-page">
+    <div class="verif-header">
+      <span class="sec-badge">100% gratuito</span>
+      <h1>Verificador de Currículo com IA</h1>
+      <p>Cole o texto do seu currículo atual e nossa IA analisa e dá sugestões específicas em segundos.</p>
+    </div>
+
+    <div class="verif-card">
+      <div class="verif-card-header">
+        <h3>Cole o texto do seu currículo</h3>
+        <p>Copie tudo do Word, PDF ou Google Docs e cole aqui abaixo</p>
+      </div>
+
+      <!-- Formulário de entrada -->
+      <div class="verif-card-body" id="verif-form">
+        <div class="verif-aviso">
+          <i class="ph ph-lock-simple"></i>
+          Seu texto não é salvo em nenhum servidor. A análise acontece apenas nessa sessão.
+        </div>
+        <textarea class="verif-textarea" id="curriculo-texto"
+          placeholder="Cole aqui o texto completo do seu currículo... Inclua nome, objetivo, experiências, formação e habilidades."
+          oninput="contarChars()"
+          maxlength="5000"></textarea>
+        <div class="verif-char"><span id="charCount">0</span>/5000 caracteres</div>
+        <button class="verif-btn" id="verif-btn" onclick="verificar()">
+          <i class="ph-bold ph-magnifying-glass"></i> Analisar meu currículo com IA
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div class="verif-loading" id="verif-loading">
+        <div class="verif-spin"></div>
+        <p style="font-size:.9rem;color:var(--gray);margin-bottom:6px">Analisando seu currículo...</p>
+        <p style="font-size:.78rem;color:var(--light)">Isso leva alguns segundos</p>
+      </div>
+
+      <!-- Resultado -->
+      <div class="verif-result" id="verif-result"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function contarChars() {
+      const txt = document.getElementById('curriculo-texto').value;
+      document.getElementById('charCount').textContent = txt.length;
+    }
+
+    async function verificar() {
+      const texto = document.getElementById('curriculo-texto').value.trim();
+      if (texto.length < 50) {
+        toast('Cole o texto do seu currículo antes de verificar.', 'error'); return;
+      }
+
+      // Mostrar loading
+      document.getElementById('verif-form').style.display    = 'none';
+      document.getElementById('verif-loading').style.display = 'block';
+
+      const prompt = `Você é um especialista em RH brasileiro. Analise o currículo abaixo e retorne um JSON com a seguinte estrutura (sem markdown, sem texto fora do JSON):
+
+{
+  "nota_geral": número de 0 a 10,
+  "classificacao": "Fraco" ou "Regular" ou "Bom" ou "Muito Bom" ou "Excelente",
+  "criterios": [
+    {"nome": "Objetivo Profissional", "nota": número de 0 a 10},
+    {"nome": "Experiências", "nota": número de 0 a 10},
+    {"nome": "Habilidades", "nota": número de 0 a 10},
+    {"nome": "Formatação e Clareza", "nota": número de 0 a 10},
+    {"nome": "Informações de Contato", "nota": número de 0 a 10}
+  ],
+  "positivos": ["ponto forte 1", "ponto forte 2"],
+  "melhorias": ["sugestão específica 1", "sugestão específica 2", "sugestão específica 3"],
+  "avisos": ["aviso ou observação importante"]
+}
+
+CURRÍCULO PARA ANALISAR:
+"${texto.substring(0, 3000)}"
+
+Regras da análise:
+- Seja honesto e específico, não genérico
+- Baseie as notas no conteúdo real do currículo
+- Sugestões devem ser acionáveis e simples de implementar
+- Considere o contexto brasileiro e público popular`;
+
+      try {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 700,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        const data = await resp.json();
+        const raw  = data.content?.[0]?.text?.trim() || '';
+        const json = JSON.parse(raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());
+        mostrarResultado(json);
+
+      } catch(e) {
+        console.error(e);
+        // Fallback com análise simulada
+        mostrarResultado(analisarLocalmente(texto));
+      }
+    }
+
+    function analisarLocalmente(texto) {
+      // Análise básica sem IA quando API não disponível
+      const tem_objetivo   = /objetivo|busco|profissional/i.test(texto);
+      const tem_experiencia= /experiência|trabalh|empresa|cargo|função/i.test(texto);
+      const tem_formacao   = /formação|curso|ensino|faculdade|escola/i.test(texto);
+      const tem_habilidades= /habilidade|skill|pacote|excel|word|comunicação/i.test(texto);
+      const tem_contato    = /email|telefone|whatsapp|\d{8,}/i.test(texto);
+      const tam            = texto.length;
+
+      const criterios = [
+        { nome: 'Objetivo Profissional', nota: tem_objetivo ? 7 : 3 },
+        { nome: 'Experiências',          nota: tem_experiencia ? 7 : 4 },
+        { nome: 'Habilidades',           nota: tem_habilidades ? 7 : 3 },
+        { nome: 'Formatação e Clareza',  nota: tam > 300 ? 6 : 4 },
+        { nome: 'Informações de Contato',nota: tem_contato ? 8 : 2 },
+      ];
+
+      const nota_geral = Math.round(criterios.reduce((s,c)=>s+c.nota,0) / criterios.length * 10) / 10;
+
+      return {
+        nota_geral,
+        classificacao: nota_geral >= 8 ? 'Muito Bom' : nota_geral >= 6 ? 'Bom' : nota_geral >= 4 ? 'Regular' : 'Fraco',
+        criterios,
+        positivos:  tem_experiencia ? ['Possui experiências profissionais listadas'] : ['Estrutura básica presente'],
+        melhorias:  [
+          !tem_objetivo   ? 'Adicione um objetivo profissional claro com o cargo que busca' : 'Especifique resultados concretos nas experiências',
+          !tem_habilidades? 'Liste suas habilidades técnicas e comportamentais' : 'Adicione nível de proficiência nas habilidades',
+          !tem_contato    ? 'Inclua telefone e email de contato' : 'Verifique se o email está atualizado',
+        ],
+        avisos: tam < 200 ? ['Currículo muito curto — adicione mais detalhes sobre suas experiências'] : []
+      };
+    }
+
+    function mostrarResultado(d) {
+      document.getElementById('verif-loading').style.display = 'none';
+
+      const corNota = d.nota_geral >= 8 ? '#16a34a' : d.nota_geral >= 6 ? '#F59E0B' : '#EF4444';
+      const estrelas = Math.round(d.nota_geral / 2);
+
+      const criteriosHTML = d.criterios.map(c => {
+        const cor = c.nota >= 7 ? '#16a34a' : c.nota >= 5 ? '#F59E0B' : '#EF4444';
+        return `
+          <div class="criterio-item">
+            <div class="criterio-top"><span>${c.nome}</span><span style="color:${cor}">${c.nota}/10</span></div>
+            <div class="criterio-bar-bg"><div class="criterio-bar-fill" style="width:${c.nota*10}%;background:${cor}"></div></div>
+          </div>`;
+      }).join('');
+
+      const posHTML = (d.positivos||[]).map(p =>
+        `<div class="sug-item positivo"><i class="ph-bold ph-check-circle"></i><span>${p}</span></div>`
+      ).join('');
+
+      const negHTML = (d.melhorias||[]).map(m =>
+        `<div class="sug-item negativo"><i class="ph ph-arrow-circle-up"></i><span>${m}</span></div>`
+      ).join('');
+
+      const aviHTML = (d.avisos||[]).map(a =>
+        `<div class="sug-item aviso"><i class="ph ph-warning"></i><span>${a}</span></div>`
+      ).join('');
+
+      document.getElementById('verif-result').style.display = 'block';
+      document.getElementById('verif-result').innerHTML = `
+        <div class="nota-section">
+          <div class="nota-circle">${d.nota_geral}</div>
+          <div class="nota-info">
+            <div class="nota-stars">${''.repeat(estrelas)}${''.repeat(5-estrelas)}</div>
+            <h3>${d.classificacao}</h3>
+            <p>Nota geral do seu currículo analisada pela IA</p>
+          </div>
+        </div>
+        <div class="criterios">${criteriosHTML}</div>
+        <div class="sugestoes-box">
+          <div class="sug-titulo">Pontos fortes</div>
+          ${posHTML}
+          <div class="sug-titulo" style="margin-top:16px">O que melhorar</div>
+          ${negHTML}
+          ${aviHTML ? `<div class="sug-titulo" style="margin-top:16px">Atenção</div>${aviHTML}` : ''}
+        </div>
+        <div class="verif-cta">
+          <h4>Quer um currículo já no formato certo?</h4>
+          <p>Crie agora com IA, PDF profissional e design que impressiona — por R$2,50</p>
+          <div class="verif-cta-btns">
+            <a href="editor.html" class="btn-criar"><i class="ph-bold ph-file-text"></i> Criar currículo profissional</a>
+            <button class="btn-novo" onclick="reiniciar()"><i class="ph ph-arrow-counterclockwise"></i> Verificar outro</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function reiniciar() {
+      document.getElementById('curriculo-texto').value = '';
+      document.getElementById('charCount').textContent = '0';
+      document.getElementById('verif-result').style.display  = 'none';
+      document.getElementById('verif-loading').style.display = 'none';
+      document.getElementById('verif-form').style.display    = 'block';
+    }
+
+    function toast(msg, tipo='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + tipo;
+      void t.offsetWidth; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

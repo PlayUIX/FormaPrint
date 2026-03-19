@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escolher Modelo — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: var(--off); }
+    .modelos-page { max-width: 1000px; margin: 0 auto; padding: 90px 20px 60px; }
+    .modelos-header { text-align: center; margin-bottom: 40px; }
+    .modelos-header h1 { color: var(--navy); margin-bottom: 8px; }
+
+    .modelos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .modelo-item {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow2);
+      border: 2.5px solid transparent;
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .modelo-item:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .modelo-item.selecionado { border-color: var(--gold); }
+    .modelo-item.em-breve { opacity: .65; cursor: default; }
+    .modelo-item.em-breve:hover { transform: none; }
+
+    .modelo-thumb {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      position: relative;
+    }
+    .modelo-overlay-sel {
+      display: none;
+      position: absolute; inset: 0;
+      background: rgba(27,42,74,.7);
+      align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      color: var(--gold);
+    }
+    .modelo-item.selecionado .modelo-overlay-sel { display: flex; }
+
+    .modelo-footer { padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; }
+    .modelo-nome { font-weight: 700; color: var(--navy); font-size: .95rem; }
+    .modelo-tag  {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 100px;
+    }
+    .modelo-tag.disponivel { background: rgba(22,163,74,.12); color: #16a34a; }
+    .modelo-tag.breve      { background: var(--off); color: var(--gray); }
+
+    .btn-continuar {
+      display: block; width: 100%; max-width: 360px; margin: 0 auto;
+      text-align: center;
+    }
+
+    /* Mini templates */
+    .mt-navy  { background: #1B2A4A; }
+    .mt-dark  { background: #1a1a2e; }
+    .mt-verde { background: #2D5A27; }
+    .mt-vinho { background: #7B2D42; }
+    .mt-cinza { background: #374151; }
+    .mt-sb    { width: 35%; flex-shrink: 0; display: flex; flex-direction: column; padding: 10px 8px; }
+    .mt-main  { flex: 1; background: white; padding: 10px 8px; }
+    .mt-av    { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.2); margin: 0 auto 8px; border: 2px solid rgba(212,175,55,.6); }
+    .mt-line  { height: 3px; border-radius: 1px; margin-bottom: 3px; }
+    .mt-w70   { width: 70%; background: rgba(255,255,255,.6); }
+    .mt-w50   { width: 50%; background: rgba(255,255,255,.4); }
+    .mt-gold  { background: #D4AF37; }
+    .mt-dline { height: 1.5px; background: #D4AF37; margin: 6px 0; }
+    .mt-dark-line { background: rgba(0,0,0,.15); }
+    .mt-g     { height: 3px; border-radius: 1px; margin-bottom: 3px; background: rgba(27,42,74,.15); }
+    .mt-g50   { width: 50%; }
+    .mt-g80   { width: 80%; }
+    .mt-g65   { width: 65%; }
+
+    /* Modelo 2: moderno sem sidebar */
+    .mt-mod-header { padding: 12px; display: flex; align-items: center; gap: 8px; }
+    .mt-mod-av { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.2); flex-shrink: 0; }
+    .mt-mod-body { background: white; flex: 1; padding: 10px; }
+
+    /* Modelo 3: minimalista */
+    .mt-min { background: white; padding: 14px; }
+    .mt-min-topo { border-bottom: 3px solid #2D5A27; padding-bottom: 8px; margin-bottom: 8px; }
+    .mt-min-nome { height: 8px; width: 70%; background: #2D5A27; border-radius: 2px; margin-bottom: 4px; }
+    .mt-min-cargo{ height: 4px; width: 50%; background: rgba(45,90,39,.4); border-radius: 2px; }
+
+    @media (max-width: 600px) {
+      .modelos-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+      <a href="../index.html" style="color:rgba(255,255,255,.6);font-size:.82rem">Voltar</a>
+    </div>
+  </nav>
+
+  <div class="modelos-page">
+    <div class="modelos-header">
+      <span class="sec-badge">Passo 1 de 3</span>
+      <h1>Escolha o modelo do currículo</h1>
+      <p style="color:var(--gray)">Você pode personalizar cores e fontes depois do pagamento</p>
+    </div>
+
+    <div class="modelos-grid">
+
+      <!-- Modelo 1: Clássico Dourado -->
+      <div class="modelo-item selecionado" onclick="selecionarModelo(1, this)" id="m1">
+        <div class="modelo-thumb">
+          <div class="modelo-overlay-sel"><i class="ph-bold ph-check-circle"></i></div>
+          <div class="mt-sb mt-navy">
+            <div class="mt-av"></div>
+            <div class="mt-line mt-w70 mt-gold"></div>
+            <div class="mt-line mt-w50" style="background:rgba(255,255,255,.5)"></div>
+            <div style="height:8px"></div>
+            <div class="mt-line mt-w70 mt-gold"></div>
+            <div class="mt-line mt-w50" style="background:rgba(255,255,255,.4)"></div>
+            <div class="mt-line" style="background:rgba(255,255,255,.4);width:60%"></div>
+          </div>
+          <div class="mt-main">
+            <div class="mt-dline"></div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g50"></div>
+            <div class="mt-g mt-g65"></div>
+            <div class="mt-dline"></div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g65"></div>
+          </div>
+        </div>
+        <div class="modelo-footer">
+          <span class="modelo-nome">Clássico Dourado</span>
+          <span class="modelo-tag disponivel">Disponivel</span>
+        </div>
+      </div>
+
+      <!-- Modelo 2: Moderno Escuro -->
+      <div class="modelo-item em-breve" onclick="selecionarModelo(2, this)" id="m2">
+        <div class="modelo-thumb">
+          <div class="modelo-overlay-sel"><i class="ph-bold ph-check-circle"></i></div>
+          <div style="width:100%;background:#1a1a2e;display:flex;flex-direction:column">
+            <div style="padding:12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.1)">
+              <div style="width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,.1);flex-shrink:0"></div>
+              <div>
+                <div style="height:7px;width:100px;background:rgba(255,255,255,.7);border-radius:2px;margin-bottom:5px"></div>
+                <div style="height:4px;width:70px;background:#06b6d4;border-radius:2px"></div>
+              </div>
+            </div>
+            <div style="padding:10px;background:white;flex:1">
+              <div class="mt-g mt-g80"></div>
+              <div class="mt-g mt-g65"></div>
+              <div class="mt-g mt-g50"></div>
+              <div style="height:6px"></div>
+              <div class="mt-g mt-g80"></div>
+              <div class="mt-g mt-g65"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modelo-footer">
+          <span class="modelo-nome">Moderno Tech</span>
+          <span class="modelo-tag breve">Em breve</span>
+        </div>
+      </div>
+
+      <!-- Modelo 3: Minimalista Verde -->
+      <div class="modelo-item em-breve" id="m3">
+        <div class="modelo-thumb">
+          <div style="width:100%;background:white;padding:14px">
+            <div style="border-bottom:3px solid #2D5A27;padding-bottom:10px;margin-bottom:10px">
+              <div style="height:8px;width:65%;background:#2D5A27;border-radius:2px;margin-bottom:5px"></div>
+              <div style="height:5px;width:45%;background:rgba(45,90,39,.4);border-radius:2px"></div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <div style="height:3px;width:60px;background:rgba(45,90,39,.3);border-radius:1px"></div>
+                <div style="height:3px;width:70px;background:rgba(45,90,39,.3);border-radius:1px"></div>
+              </div>
+            </div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g65"></div>
+            <div class="mt-g mt-g50"></div>
+            <div style="height:8px"></div>
+            <div style="height:4px;width:60%;background:#2D5A27;border-radius:2px;opacity:.4;margin-bottom:5px"></div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g65"></div>
+          </div>
+        </div>
+        <div class="modelo-footer">
+          <span class="modelo-nome">Minimalista</span>
+          <span class="modelo-tag breve">Em breve</span>
+        </div>
+      </div>
+
+      <!-- Modelo 4: Vinho Premium -->
+      <div class="modelo-item em-breve" id="m4">
+        <div class="modelo-thumb">
+          <div class="mt-sb mt-vinho">
+            <div class="mt-av" style="border-color:rgba(255,255,255,.4)"></div>
+            <div class="mt-line mt-w70" style="background:rgba(255,255,255,.7)"></div>
+            <div class="mt-line mt-w50" style="background:rgba(255,255,255,.4)"></div>
+            <div style="height:8px"></div>
+            <div class="mt-line mt-w70" style="background:rgba(255,255,255,.5)"></div>
+            <div class="mt-line mt-w50" style="background:rgba(255,255,255,.3)"></div>
+          </div>
+          <div class="mt-main">
+            <div style="height:1.5px;background:#7B2D42;opacity:.4;margin-bottom:6px"></div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g50"></div>
+            <div class="mt-g mt-g65"></div>
+            <div style="height:1.5px;background:#7B2D42;opacity:.4;margin:6px 0"></div>
+            <div class="mt-g mt-g80"></div>
+            <div class="mt-g mt-g65"></div>
+          </div>
+        </div>
+        <div class="modelo-footer">
+          <span class="modelo-nome">Vinho Elegante</span>
+          <span class="modelo-tag breve">Em breve</span>
+        </div>
+      </div>
+
+      <!-- Modelo 5: Grafite -->
+      <div class="modelo-item em-breve" id="m5">
+        <div class="modelo-thumb">
+          <div style="width:100%;background:#374151;display:flex;flex-direction:column">
+            <div style="padding:14px;background:#1f2937">
+              <div style="height:9px;width:70%;background:rgba(255,255,255,.8);border-radius:2px;margin-bottom:5px"></div>
+              <div style="height:5px;width:50%;background:#F59E0B;border-radius:2px"></div>
+            </div>
+            <div style="display:flex;flex:1">
+              <div style="width:38%;padding:8px;background:#374151">
+                <div style="height:3px;width:80%;background:rgba(255,255,255,.5);border-radius:1px;margin-bottom:3px"></div>
+                <div style="height:3px;width:60%;background:rgba(255,255,255,.3);border-radius:1px;margin-bottom:3px"></div>
+                <div style="height:3px;width:70%;background:rgba(255,255,255,.3);border-radius:1px"></div>
+              </div>
+              <div style="flex:1;background:white;padding:8px">
+                <div class="mt-g mt-g80"></div>
+                <div class="mt-g mt-g65"></div>
+                <div class="mt-g mt-g50"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modelo-footer">
+          <span class="modelo-nome">Grafite Moderno</span>
+          <span class="modelo-tag breve">Em breve</span>
+        </div>
+      </div>
+
+    </div>
+
+    <a href="editor.html" class="btn-primary btn-continuar" id="btnContinuar">
+      <i class="ph-bold ph-arrow-right"></i> Continuar com Modelo Clássico Dourado
+    </a>
+  </div>
+
+  <script>
+    let modeloSelecionado = 1;
+
+    function selecionarModelo(num, el) {
+      if (el.classList.contains('em-breve')) return;
+      document.querySelectorAll('.modelo-item').forEach(m => m.classList.remove('selecionado'));
+      el.classList.add('selecionado');
+      modeloSelecionado = num;
+      localStorage.setItem('fpbr_modelo', num);
+
+      const nomes = {1:'Clássico Dourado', 2:'Moderno Tech', 3:'Minimalista', 4:'Vinho Elegante', 5:'Grafite Moderno'};
+      document.getElementById('btnContinuar').innerHTML = `<i class="ph-bold ph-arrow-right"></i> Continuar com ${nomes[num]}`;
+    }
+
+    // Restaurar seleção anterior
+    const salvo = localStorage.getItem('fpbr_modelo');
+    if (salvo && document.getElementById('m'+salvo)) {
+      document.querySelectorAll('.modelo-item').forEach(m => m.classList.remove('selecionado'));
+      const el = document.getElementById('m'+salvo);
+      if (!el.classList.contains('em-breve')) el.classList.add('selecionado');
+    }
+  </script>
+</body>
+</html>

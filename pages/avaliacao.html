@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliar — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: var(--off); }
+    .aval-page { max-width: 560px; margin: 0 auto; padding: 100px 24px 60px; }
+    .aval-header { text-align: center; margin-bottom: 32px; }
+    .aval-header h1 { color: var(--navy); font-size: clamp(1.5rem,4vw,2.2rem); margin-bottom: 8px; }
+
+    .aval-card {
+      background: var(--white); border-radius: 16px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .aval-card-hd { background: var(--navy); padding: 18px 24px; }
+    .aval-card-hd h3 { color: var(--white); font-size: 1rem; }
+    .aval-card-hd p  { color: rgba(255,255,255,.55); font-size: .78rem; }
+    .aval-card-body  { padding: 24px; }
+
+    /* Estrelas */
+    .stars-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+    .star-btn {
+      font-size: 2.2rem; cursor: pointer; transition: transform .15s;
+      background: none; border: none; color: var(--light);
+      line-height: 1;
+    }
+    .star-btn:hover, .star-btn.on { color: var(--gold); transform: scale(1.15); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: .8rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--light); border-radius: 8px;
+      font-family: var(--body); font-size: .88rem; color: var(--dark);
+      outline: none; transition: border-color var(--t);
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--navy); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+
+    .btn-enviar {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      font-size: .95rem; padding: 13px; border-radius: 10px;
+      border: none; cursor: pointer; font-family: var(--body);
+      transition: all var(--t); margin-top: 8px;
+    }
+    .btn-enviar:hover { background: var(--gold2); }
+
+    .sucesso-state { display: none; text-align: center; padding: 40px 24px; }
+    .sucesso-icon  { font-size: 3.5rem; color: #16a34a; margin-bottom: 16px; }
+    .sucesso-state h3 { color: var(--navy); margin-bottom: 10px; }
+    .sucesso-state p  { margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+      <a href="editor.html" class="btn-nav" style="margin-left:auto">Criar currículo</a>
+    </div>
+  </nav>
+
+  <div class="aval-page">
+    <div class="aval-header">
+      <span class="sec-badge">Sua opinião importa</span>
+      <h1>Como foi sua experiência?</h1>
+      <p style="color:var(--gray)">Sua avaliação aparece no site e ajuda outras pessoas a conhecerem o FormaPrint BR.</p>
+    </div>
+
+    <div class="aval-card">
+      <div class="aval-card-hd">
+        <h3>Deixe sua avaliação</h3>
+        <p>Leva menos de 1 minuto</p>
+      </div>
+      <div class="aval-card-body">
+
+        <!-- Form -->
+        <div id="avalForm">
+          <div style="text-align:center;margin-bottom:8px;font-size:.82rem;font-weight:700;color:var(--navy)">Sua nota</div>
+          <div class="stars-row" id="starsRow">
+            <button class="star-btn" data-v="1" onclick="setNota(1)"></button>
+            <button class="star-btn" data-v="2" onclick="setNota(2)"></button>
+            <button class="star-btn" data-v="3" onclick="setNota(3)"></button>
+            <button class="star-btn" data-v="4" onclick="setNota(4)"></button>
+            <button class="star-btn" data-v="5" onclick="setNota(5)"></button>
+          </div>
+
+          <div class="form-group">
+            <label>Seu nome *</label>
+            <input type="text" id="av-nome" placeholder="Ex: Maria Silva">
+          </div>
+
+          <div class="form-group">
+            <label>Cidade e estado</label>
+            <input type="text" id="av-local" placeholder="Ex: São Luís, MA">
+          </div>
+
+          <div class="form-group">
+            <label>Você conseguiu emprego com o currículo?</label>
+            <select id="av-emprego" style="width:100%;padding:10px 13px;border:1.5px solid var(--light);border-radius:8px;font-family:var(--body);font-size:.88rem;outline:none">
+              <option value="">Selecione...</option>
+              <option value="sim_rapido">Sim, em menos de 1 semana</option>
+              <option value="sim">Sim, consegui emprego</option>
+              <option value="entrevista">Fui chamado para entrevistas</option>
+              <option value="processo">Ainda em processo</option>
+              <option value="nao">Ainda não</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Conte sua experiência *</label>
+            <textarea id="av-texto" placeholder="Como foi usar o FormaPrint BR? O design ficou bom? A IA ajudou? O que você achou do processo?"></textarea>
+          </div>
+
+          <button class="btn-enviar" onclick="enviarAvaliacao()">
+            <i class="ph-bold ph-paper-plane-right"></i> Enviar avaliação
+          </button>
+        </div>
+
+        <!-- Sucesso -->
+        <div class="sucesso-state" id="avalSucesso">
+          <div class="sucesso-icon"><i class="ph-bold ph-check-circle"></i></div>
+          <h3>Obrigado pela avaliação!</h3>
+          <p>Sua avaliação aparecerá na página inicial para ajudar outras pessoas.</p>
+          <a href="../index.html" class="btn-primary" style="margin:0 auto;display:inline-flex">
+            <i class="ph-bold ph-arrow-left"></i> Voltar para o início
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let notaSelecionada = 0;
+
+    function setNota(n) {
+      notaSelecionada = n;
+      document.querySelectorAll('.star-btn').forEach((btn,i) => {
+        btn.classList.toggle('on', i < n);
+      });
+    }
+
+    function enviarAvaliacao() {
+      const nome   = document.getElementById('av-nome').value.trim();
+      const texto  = document.getElementById('av-texto').value.trim();
+      const local  = document.getElementById('av-local').value.trim();
+      const emprego= document.getElementById('av-emprego').value;
+
+      if (!notaSelecionada) { toast('Selecione uma nota de 1 a 5 estrelas.','error'); return; }
+      if (!nome)            { toast('Preencha seu nome.','error'); return; }
+      if (texto.length < 20){ toast('Escreva um pouco mais sobre sua experiência.','error'); return; }
+
+      // Montar cargo baseado no emprego
+      let cargo = local ? local : 'Usuário FormaPrint BR';
+      if (emprego === 'sim_rapido') cargo = 'Contratado em menos de 1 semana' + (local ? ' — ' + local : '');
+      else if (emprego === 'sim')   cargo = 'Contratado com sucesso' + (local ? ' — ' + local : '');
+      else if (emprego === 'entrevista') cargo = 'Chamado para entrevistas' + (local ? ' — ' + local : '');
+
+      // Salvar no localStorage (aparece na landing page)
+      const avals = JSON.parse(localStorage.getItem('fpbr_avaliacoes') || '[]');
+      avals.push({
+        nota: notaSelecionada,
+        texto,
+        nome,
+        cargo,
+        cor: ['#1B2A4A','#D4AF37','#7B2D42','#2D5A27','#1B4F6B'][Math.floor(Math.random()*5)],
+        data: new Date().toISOString()
+      });
+      localStorage.setItem('fpbr_avaliacoes', JSON.stringify(avals));
+
+      // Mostrar sucesso
+      document.getElementById('avalForm').style.display = 'none';
+      document.getElementById('avalSucesso').style.display = 'block';
+    }
+
+    function toast(msg, tipo='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + tipo;
+      void t.offsetWidth; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

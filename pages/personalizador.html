@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalizar Currículo — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&family=Montserrat:wght@700;900&family=Merriweather:wght@700&family=Raleway:wght@700;900&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- jsPDF + html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Canva Button SDK -->
+  <script src="https://sdk.canva.com/v2/beta/api.js"></script>
+  <style>
+    /*  Layout geral  */
+    body { background: #f0ede6; margin: 0; overflow-x: hidden; }
+
+    .pers-wrap {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+
+    /*  Painel lateral de controles  */
+    .pers-panel {
+      background: var(--white);
+      box-shadow: 2px 0 20px rgba(0,0,0,0.08);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pers-panel-header {
+      background: var(--navy);
+      padding: 16px 20px;
+      flex-shrink: 0;
+    }
+    .pers-panel-header .logo { display: block; margin-bottom: 12px; }
+    .pers-panel-header h2 {
+      color: var(--white);
+      font-size: 1rem;
+      font-family: var(--font-body);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .pers-panel-header p { color: rgba(255,255,255,0.55); font-size: 0.78rem; }
+
+    .pers-panel-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      scrollbar-width: thin;
+    }
+    .pers-panel-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--light);
+      background: var(--white);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Seções do painel */
+    .panel-section { margin-bottom: 28px; }
+    .panel-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    /*  Paleta de cores  */
+    .cores-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .cor-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .cor-btn:hover { transform: scale(1.1); }
+    .cor-btn.ativo {
+      border-color: var(--dark);
+      box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--dark);
+    }
+    .cor-btn.ativo::after {
+      content: '';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /*  Fontes  */
+    .fontes-lista { display: flex; flex-direction: column; gap: 8px; }
+    .fonte-btn {
+      padding: 12px 14px;
+      border: 1.5px solid var(--light);
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--white);
+      text-align: left;
+      transition: all var(--trans);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .fonte-btn:hover { border-color: var(--navy); }
+    .fonte-btn.ativo {
+      border-color: var(--gold);
+      background: rgba(212,175,55,0.06);
+    }
+    .fonte-btn .f-nome-amostra {
+      font-size: 1rem;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+    .fonte-btn .f-label {
+      font-size: 0.7rem;
+      color: var(--gray);
+      font-family: var(--font-body);
+    }
+
+    /*  Seções visíveis (toggles)  */
+    .secoes-lista { display: flex; flex-direction: column; gap: 8px; }
+    .secao-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--off);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .secao-toggle-label { font-size: 0.88rem; color: var(--dark); font-weight: 400; }
+    .toggle-switch {
+      width: 38px; height: 21px;
+      background: var(--light);
+      border-radius: 100px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 15px; height: 15px;
+      background: var(--white);
+      border-radius: 50%;
+      transition: left 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .toggle-switch.on { background: var(--navy); }
+    .toggle-switch.on::after { left: 20px; }
+
+    /*  Ícones de contato  */
+    .icones-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .icone-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border: 1.5px solid var(--light);
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--white);
+      transition: all var(--trans);
+    }
+    .icone-btn:hover { border-color: var(--navy); }
+    .icone-btn.ativo { border-color: var(--gold); background: rgba(212,175,55,0.06); }
+    .icone-btn span:first-child { font-size: 1.1rem; }
+    .icone-btn span:last-child { font-size: 0.65rem; color: var(--gray); }
+
+    /*  Botão Canva  */
+    .btn-canva {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #7B61FF;
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 13px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all var(--trans);
+    }
+    .btn-canva:hover { background: #6248f5; transform: translateY(-1px); }
+    .btn-canva svg { width: 18px; height: 18px; }
+
+    .btn-download-final {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 13px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all var(--trans);
+    }
+    .btn-download-final:hover { background: var(--gold2); transform: translateY(-1px); }
+    .btn-download-final:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-vagas-pers {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--off);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 11px 20px;
+      border-radius: 10px;
+      border: 1.5px solid var(--light);
+      cursor: pointer;
+      font-family: var(--font-body);
+      text-decoration: none;
+      transition: all var(--trans);
+    }
+    .btn-vagas-pers:hover { background: var(--light); }
+
+    /*  Área de prévia  */
+    .pers-preview-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 24px 60px;
+      gap: 20px;
+    }
+    .pers-preview-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 640px;
+    }
+    .pers-preview-topbar h3 {
+      font-size: 0.88rem;
+      color: var(--gray);
+      font-family: var(--font-body);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .zoom-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border-radius: 8px;
+      padding: 6px 12px;
+      box-shadow: var(--shadow2);
+      font-size: 0.82rem;
+    }
+    .zoom-controls button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--navy);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .zoom-controls button:hover { background: var(--off); }
+    .zoom-val-txt { font-weight: 700; color: var(--navy); min-width: 38px; text-align: center; }
+
+    /* PDF loading state */
+    .pdf-loading-bar {
+      display: none;
+      width: 100%;
+      max-width: 640px;
+      background: var(--white);
+      border-radius: 10px;
+      padding: 14px 20px;
+      box-shadow: var(--shadow2);
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+    .pdf-loading-bar.show { display: flex; }
+    .mini-spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid var(--light);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /*  Currículo A4 renderizável  */
+    .cv-outer-wrap {
+      transform-origin: top center;
+      transition: transform 0.2s ease;
+    }
+    .cv-shadow-wrap {
+      box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    /* == CURRÍCULO MODELO 01 == */
+    #cvPersonalizavel {
+      width: 595px;
+      min-height: 842px;
+      background: #FFFFFF;
+      display: flex;
+      font-family: 'Lato', Arial, sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .cvp-sidebar {
+      width: 185px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.4s ease;
+    }
+    .cvp-sidebar-top {
+      padding: 30px 18px 22px;
+      transition: background 0.4s ease;
+    }
+
+    .cvp-foto-wrap {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 14px;
+      border: 3px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.4);
+      font-size: 2rem;
+      transition: border-color 0.3s;
+    }
+    .cvp-foto-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+    .cvp-s-group {
+      padding: 13px 18px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+    }
+    .cvp-s-label {
+      display: block;
+      font-size: 7px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 8px;
+      transition: color 0.3s;
+    }
+    /* Quando ativo, label fica da cor dourada do painel */
+    .cvp-s-label.cor-accent { color: rgba(255,255,255,0.9); }
+    .cvp-s-text {
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.65;
+      word-break: break-all;
+    }
+    .cvp-icone-linha {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      margin-bottom: 5px;
+      font-size: 8px;
+      color: rgba(255,255,255,0.8);
+    }
+    .cvp-icone-emoji { font-size: 9px; line-height: 1; }
+    .cvp-skill-item { margin-bottom: 7px; }
+    .cvp-skill-name { font-size: 8px; color: rgba(255,255,255,0.85); margin-bottom: 3px; }
+    .cvp-skill-bg { background: rgba(255,255,255,0.18); border-radius: 2px; height: 3.5px; }
+    .cvp-skill-fill {
+      height: 3.5px;
+      border-radius: 2px;
+      width: 80%;
+      background: rgba(255,255,255,0.7);
+      transition: background 0.3s;
+    }
+    /* Idiomas */
+    .cvp-idioma-item { font-size: 8px; color: rgba(255,255,255,0.8); margin-bottom: 3px; }
+
+    /* Coluna principal */
+    .cvp-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .cvp-main-header {
+      padding: 28px 22px 18px;
+      transition: background 0.4s ease;
+    }
+    .cvp-nome {
+      font-size: 20px;
+      font-weight: 900;
+      color: #FFFFFF;
+      line-height: 1.1;
+      margin-bottom: 5px;
+      transition: font-family 0.2s;
+    }
+    .cvp-cargo-desejado {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      transition: color 0.3s;
+    }
+    .cvp-divisor {
+      height: 2px;
+      margin: 0 22px;
+      transition: background 0.3s;
+    }
+    .cvp-body { flex: 1; padding: 16px 22px; }
+    .cvp-section { margin-bottom: 14px; }
+    .cvp-section-title {
+      display: block;
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 9px;
+      padding-bottom: 4px;
+      border-bottom-width: 1.5px;
+      border-bottom-style: solid;
+      transition: color 0.3s, border-color 0.3s, font-family 0.2s;
+    }
+    .cvp-objetivo-text {
+      font-size: 9px;
+      line-height: 1.65;
+      color: #4B5563;
+    }
+    .cvp-exp-item {
+      margin-bottom: 11px;
+      padding-left: 10px;
+      border-left-width: 2px;
+      border-left-style: solid;
+      transition: border-color 0.3s;
+    }
+    .cvp-exp-cargo { font-size: 9.5px; font-weight: 700; color: #1B2A4A; margin-bottom: 2px; }
+    .cvp-exp-empresa { font-size: 8.5px; font-weight: 700; margin-bottom: 2px; transition: color 0.3s; }
+    .cvp-exp-periodo { font-size: 7.5px; color: #6B7280; margin-bottom: 3px; }
+    .cvp-exp-desc { font-size: 8.5px; line-height: 1.5; color: #4B5563; }
+    .cvp-form-item { margin-bottom: 9px; }
+    .cvp-form-curso { font-size: 9.5px; font-weight: 700; color: #1B2A4A; }
+    .cvp-form-inst  { font-size: 8px; color: #6B7280; }
+    .cvp-watermark  { text-align: center; font-size: 6.5px; color: rgba(0,0,0,0.15); padding: 8px; }
+
+    /* Overlay de bloqueio */
+    .lock-overlay { display: none; }
+    .lock-overlay.ativo { display: flex; }
+
+    /* Canva modal hint */
+    .canva-hint {
+      background: rgba(123,97,255,0.08);
+      border: 1px solid rgba(123,97,255,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.78rem;
+      color: #4c35d9;
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .pers-wrap { grid-template-columns: 1fr; }
+      .pers-panel { height: auto; position: static; overflow: visible; }
+      .pers-panel-scroll { overflow: visible; }
+      .pers-preview-col { padding: 20px 12px 40px; }
+      #cvPersonalizavel { width: 100%; max-width: 595px; }
+      .cv-outer-wrap { transform: none !important; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+</head>
+<body>
+
+<!-- Overlay bloqueio se não pagou -->
+<div class="lock-overlay" id="lockOverlay">
+  <div style="max-width:400px;text-align:center">
+    <div style="font-size:3rem;margin-bottom:16px"><i class="ph ph-lock-simple"></i></div>
+    <h2>Acesso restrito</h2>
+    <p style="margin-bottom:24px">O personalizador é liberado após o pagamento. Finalize a compra para personalizar e baixar seu currículo.</p>
+    <a href="pagamento.html" class="btn-primary">Finalizar pagamento →</a>
+    <div style="margin-top:16px">
+      <a href="editor.html" style="color:rgba(255,255,255,0.5);font-size:0.82rem">← Voltar ao editor</a>
+    </div>
+  </div>
+</div>
+
+<div class="pers-wrap">
+
+  <!--  PAINEL DE CONTROLES  -->
+  <aside class="pers-panel">
+    <div class="pers-panel-header">
+      <a href="../index.html" class="logo">
+        <span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span>
+      </a>
+      <h2>Personalizador Visual</h2>
+      <p>Ajuste cores, fontes e layout do seu currículo</p>
+    </div>
+
+    <div class="pers-panel-scroll">
+
+      <!-- Paleta de cores -->
+      <div class="panel-section">
+        <span class="panel-section-title"><i class="ph ph-palette"></i> Cor principal</span>
+        <div class="cores-grid" id="coresGrid">
+          <!-- geradas via JS -->
+        </div>
+      </div>
+
+      <!-- Fontes dos títulos -->
+      <div class="panel-section">
+        <span class="panel-section-title">Aa Fonte dos títulos</span>
+        <div class="fontes-lista" id="fontesLista">
+          <!-- geradas via JS -->
+        </div>
+      </div>
+
+      <!-- Seções visíveis -->
+      <div class="panel-section">
+        <span class="panel-section-title"> Seções visíveis</span>
+        <div class="secoes-lista" id="secoesLista">
+          <!-- geradas via JS -->
+        </div>
+      </div>
+
+      <!-- Ícones de contato -->
+      <div class="panel-section">
+        <span class="panel-section-title"> Estilo dos ícones de contato</span>
+        <div class="icones-grid" id="iconesGrid">
+          <!-- gerados via JS -->
+        </div>
+      </div>
+
+      <!-- Botão Canva -->
+      <div class="panel-section">
+        <span class="panel-section-title"> Edição avançada</span>
+        <div class="canva-hint">
+          Abra seu currículo no Canva para personalização livre: mude elementos, adicione fotos de fundo, troque ícones e muito mais.
+        </div>
+        <button class="btn-canva" id="btnCanva" onclick="abrirCanva()">
+          <svg viewBox="0 0 100 100" fill="none"><rect width="100" height="100" rx="22" fill="#7B61FF"/><path d="M50 18C32.3 18 18 32.3 18 50s14.3 32 32 32 32-14.3 32-32S67.7 18 50 18zm0 50c-9.9 0-18-8.1-18-18s8.1-18 18-18 18 8.1 18 18-8.1 18-18 18z" fill="white"/></svg>
+          Editar no Canva
+        </button>
+      </div>
+
+    </div>
+
+    <div class="pers-panel-footer">
+      <button class="btn-download-final" id="btnDownloadFinal" onclick="gerarPDF()">
+        <i class="ph ph-download-simple"></i> Baixar PDF profissional
+      </button>
+      <a href="vagas.html" class="btn-vagas-pers">
+        <i class="ph ph-target"></i> Enviar para vagas da minha cidade
+      </a>
+    </div>
+  </aside>
+
+  <!--  ÁREA DE PRÉVIA  -->
+  <main class="pers-preview-col">
+
+    <div class="pers-preview-topbar">
+      <h3>Prévia do currículo</h3>
+      <div class="zoom-controls">
+        <button onclick="ajustarZoom(-10)">−</button>
+        <span class="zoom-val-txt" id="zoomTxt">65%</span>
+        <button onclick="ajustarZoom(+10)">+</button>
+      </div>
+    </div>
+
+    <div class="pdf-loading-bar" id="pdfLoadingBar">
+      <div class="mini-spinner"></div>
+      <span>Gerando PDF em alta qualidade...</span>
+    </div>
+
+    <div class="cv-outer-wrap" id="cvOuterWrap">
+      <div class="cv-shadow-wrap">
+
+        <!--  CURRÍCULO PERSONALIZÁVEL  -->
+        <div id="cvPersonalizavel">
+
+          <!-- SIDEBAR -->
+          <div class="cvp-sidebar" id="cvpSidebar">
+            <div class="cvp-sidebar-top" id="cvpSidebarTop">
+              <div class="cvp-foto-wrap" id="cvpFotoWrap"><i class="ph ph-user"></i></div>
+            </div>
+
+            <!-- Contato -->
+            <div class="cvp-s-group" id="secaoContato">
+              <span class="cvp-s-label">Contato</span>
+              <div id="cvpContatoLista"></div>
+            </div>
+
+            <!-- Habilidades -->
+            <div class="cvp-s-group" id="secaoHabilidades">
+              <span class="cvp-s-label">Habilidades</span>
+              <div id="cvpHabilidades"></div>
+            </div>
+
+            <!-- Idiomas -->
+            <div class="cvp-s-group" id="secaoIdiomas" style="display:none">
+              <span class="cvp-s-label">Idiomas</span>
+              <div id="cvpIdiomas"></div>
+            </div>
+          </div>
+
+          <!-- MAIN -->
+          <div class="cvp-main">
+            <div class="cvp-main-header" id="cvpMainHeader">
+              <div class="cvp-nome" id="cvpNome">Nome Completo</div>
+              <div class="cvp-cargo-desejado" id="cvpCargoDesejado">Cargo Desejado</div>
+            </div>
+            <div class="cvp-divisor" id="cvpDivisor"></div>
+            <div class="cvp-body">
+
+              <!-- Objetivo -->
+              <div class="cvp-section" id="secaoObjetivo">
+                <span class="cvp-section-title" id="titleObjetivo">Objetivo Profissional</span>
+                <div class="cvp-objetivo-text" id="cvpObjetivo"></div>
+              </div>
+
+              <!-- Experiências -->
+              <div class="cvp-section" id="secaoExperiencias">
+                <span class="cvp-section-title" id="titleExperiencias">Experiências Profissionais</span>
+                <div id="cvpExperiencias"></div>
+              </div>
+
+              <!-- Formação -->
+              <div class="cvp-section" id="secaoFormacao">
+                <span class="cvp-section-title" id="titleFormacao">Formação Acadêmica</span>
+                <div id="cvpFormacao"></div>
+              </div>
+
+            </div>
+            <div class="cvp-watermark">formaprintbr.com.br</div>
+          </div>
+
+        </div>
+        <!-- /cvPersonalizavel -->
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // 
+  //  CONFIGURAÇÕES
+  // 
+
+  //  Paleta de cores disponíveis 
+  const CORES = [
+    { nome: 'Navy Clássico',   cor: '#1B2A4A', dark: '#243660' },
+    { nome: 'Preto Elegante',  cor: '#1a1a2e', dark: '#0f0f1a' },
+    { nome: 'Bordô Nobre',     cor: '#7B2D42', dark: '#5c1f30' },
+    { nome: 'Verde Musgo',     cor: '#2D5A27', dark: '#1e3d1a' },
+    { nome: 'Petróleo',        cor: '#1B4F6B', dark: '#123547' },
+    { nome: 'Roxo Profundo',   cor: '#3D2B6B', dark: '#2a1d4a' },
+    { nome: 'Cobre Moderno',   cor: '#7B4A1E', dark: '#5a3512' },
+    { nome: 'Ardósia',         cor: '#374151', dark: '#1f2937' },
+    { nome: 'Azul Turquesa',   cor: '#0E4D6B', dark: '#093447' },
+    { nome: 'Marrom Café',     cor: '#4A2C17', dark: '#321e0f' },
+    { nome: 'Cinza Premium',   cor: '#2C3E50', dark: '#1a252f' },
+    { nome: 'Índigo',          cor: '#312E81', dark: '#1e1b4b' },
+  ];
+
+  //  Fontes disponíveis 
+  const FONTES = [
+    { id: 'playfair',   nome: 'Playfair Display', amostra: 'Elegante', css: "'Playfair Display', Georgia, serif"   },
+    { id: 'montserrat', nome: 'Montserrat',        amostra: 'Moderno',  css: "'Montserrat', sans-serif"             },
+    { id: 'raleway',    nome: 'Raleway',            amostra: 'Refinado', css: "'Raleway', sans-serif"                },
+    { id: 'poppins',    nome: 'Poppins',            amostra: 'Dinâmico', css: "'Poppins', sans-serif"                },
+    { id: 'merriweather',nome:'Merriweather',       amostra: 'Clássico', css: "'Merriweather', Georgia, serif"       },
+  ];
+
+  //  Seções toggleáveis 
+  const SECOES = [
+    { id: 'secaoFoto',         label: 'Foto',                      on: true  },
+    { id: 'secaoObjetivo',     label: 'Objetivo profissional',      on: true  },
+    { id: 'secaoExperiencias', label: 'Experiências',               on: true  },
+    { id: 'secaoFormacao',     label: 'Formação acadêmica',         on: true  },
+    { id: 'secaoHabilidades',  label: 'Habilidades',                on: true  },
+    { id: 'secaoIdiomas',      label: 'Idiomas',                    on: false },
+    { id: 'secaoContato',      label: 'Contato (sidebar)',          on: true  },
+  ];
+
+  //  Estilos de ícone de contato 
+  const ICONES = [
+    { id: 'emoji',    label: 'Emoji',   telefone: '<i class="ph ph-phone"></i>', email: '<i class="ph ph-envelope-simple"></i>', cidade: '<i class="ph ph-map-pin"></i>', linkedin: '<i class="ph ph-link"></i>' },
+    { id: 'minimal',  label: 'Minimal', telefone: '·',  email: '·', cidade: '·',  linkedin: '·'  },
+    { id: 'bullets',  label: 'Pontos',  telefone: '•',  email: '•', cidade: '•',  linkedin: '•'  },
+    { id: 'text',     label: 'Texto',   telefone: 'Tel:',email:'Email:',cidade:'Local:',linkedin:'LinkedIn:'},
+  ];
+
+  // 
+  //  ESTADO
+  // 
+  let estado = {
+    corIdx:     0,
+    fonteIdx:   0,
+    iconeIdx:   0,
+    secoes:     Object.fromEntries(SECOES.map(s => [s.id, s.on])),
+    zoom:       65
+  };
+  let dados = {};
+
+  // 
+  //  VERIFICAR PAGAMENTO
+  // 
+  const pago = sessionStorage.getItem('fpbr_pago') === 'true'
+            || localStorage.getItem('fpbr_pago')    === 'true';
+  const urlStatus = new URLSearchParams(window.location.search).get('status')
+                 || new URLSearchParams(window.location.search).get('collection_status');
+  const pagamentoOk = pago || urlStatus === 'approved';
+
+  if (!pagamentoOk) {
+    document.getElementById('lockOverlay').classList.add('ativo');
+  }
+
+  // 
+  //  CARREGAR DADOS DO LOCALSTORAGE
+  // 
+  try {
+    dados = JSON.parse(localStorage.getItem('fpbr_dados') || '{}');
+  } catch(e) { dados = {}; }
+
+  // 
+  //  RENDER DO PAINEL
+  // 
+  function renderPainel() {
+    // Cores
+    const coresGrid = document.getElementById('coresGrid');
+    coresGrid.innerHTML = '';
+    CORES.forEach((c, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'cor-btn' + (i === estado.corIdx ? ' ativo' : '');
+      btn.style.background = c.cor;
+      btn.title = c.nome;
+      btn.onclick = () => { estado.corIdx = i; aplicarEstado(); renderPainel(); };
+      coresGrid.appendChild(btn);
+    });
+
+    // Fontes
+    const fontesLista = document.getElementById('fontesLista');
+    fontesLista.innerHTML = '';
+    FONTES.forEach((f, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'fonte-btn' + (i === estado.fonteIdx ? ' ativo' : '');
+      btn.innerHTML = `
+        <span class="f-nome-amostra" style="font-family:${f.css}">${f.amostra}</span>
+        <span class="f-label">${f.nome}</span>
+      `;
+      btn.onclick = () => { estado.fonteIdx = i; aplicarEstado(); renderPainel(); };
+      fontesLista.appendChild(btn);
+    });
+
+    // Seções
+    const secoesLista = document.getElementById('secoesLista');
+    secoesLista.innerHTML = '';
+    SECOES.forEach(s => {
+      const row = document.createElement('div');
+      row.className = 'secao-toggle';
+      const on = estado.secoes[s.id];
+      row.innerHTML = `
+        <span class="secao-toggle-label">${s.label}</span>
+        <div class="toggle-switch ${on ? 'on' : ''}"></div>
+      `;
+      row.onclick = () => {
+        estado.secoes[s.id] = !estado.secoes[s.id];
+        aplicarEstado();
+        renderPainel();
+      };
+      secoesLista.appendChild(row);
+    });
+
+    // Ícones
+    const iconesGrid = document.getElementById('iconesGrid');
+    iconesGrid.innerHTML = '';
+    ICONES.forEach((ic, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'icone-btn' + (i === estado.iconeIdx ? ' ativo' : '');
+      btn.innerHTML = `<span>${ic.telefone}</span><span>${ic.label}</span>`;
+      btn.onclick = () => { estado.iconeIdx = i; aplicarEstado(); renderPainel(); };
+      iconesGrid.appendChild(btn);
+    });
+  }
+
+  // 
+  //  APLICAR ESTADO AO CURRÍCULO
+  // 
+  function aplicarEstado() {
+    const cor    = CORES[estado.corIdx];
+    const fonte  = FONTES[estado.fonteIdx];
+    const icone  = ICONES[estado.iconeIdx];
+
+    //  Cores 
+    document.getElementById('cvpSidebar').style.background     = cor.cor;
+    document.getElementById('cvpSidebarTop').style.background  = cor.dark;
+    document.getElementById('cvpMainHeader').style.background  = cor.cor;
+    document.getElementById('cvpDivisor').style.background     = 'rgba(212,175,55,0.8)';
+    document.getElementById('cvpCargoDesejado').style.color    = 'rgba(255,255,255,0.75)';
+
+    // Títulos de seção com a cor primary
+    document.querySelectorAll('.cvp-section-title').forEach(el => {
+      el.style.color       = cor.cor;
+      el.style.borderColor = cor.cor;
+    });
+
+    // Barras de skill fill
+    document.querySelectorAll('.cvp-skill-fill').forEach(el => {
+      el.style.background = 'rgba(255,255,255,0.75)';
+    });
+
+    // Exp item border
+    document.querySelectorAll('.cvp-exp-item').forEach(el => {
+      el.style.borderColor = cor.cor;
+    });
+    document.querySelectorAll('.cvp-exp-empresa').forEach(el => {
+      el.style.color = cor.cor;
+    });
+
+    //  Fonte 
+    const fontCss = fonte.css;
+    document.getElementById('cvpNome').style.fontFamily = fontCss;
+    document.querySelectorAll('.cvp-section-title').forEach(el => {
+      el.style.fontFamily = fontCss;
+    });
+
+    //  Zoom 
+    document.getElementById('cvOuterWrap').style.transform = `scale(${estado.zoom / 100})`;
+    document.getElementById('zoomTxt').textContent = estado.zoom + '%';
+
+    //  Seções 
+    SECOES.forEach(s => {
+      const el = document.getElementById(s.id);
+      if (!el) return;
+      if (s.id === 'secaoFoto') {
+        document.getElementById('cvpFotoWrap').style.display = estado.secoes[s.id] ? '' : 'none';
+        return;
+      }
+      // Seção idiomas: só esconde se não tiver dados OU toggle off
+      if (s.id === 'secaoIdiomas') {
+        el.style.display = (estado.secoes[s.id] && dados.idiomas) ? '' : 'none';
+        return;
+      }
+      el.style.display = estado.secoes[s.id] ? '' : 'none';
+    });
+
+    //  Ícones de contato 
+    preencherContato(icone);
+  }
+
+  // 
+  //  PREENCHER CONTEÚDO DO CURRÍCULO
+  // 
+  function preencherCurriculo() {
+    // Nome e cargo
+    document.getElementById('cvpNome').textContent         = dados.nome  || 'Seu Nome Completo';
+    document.getElementById('cvpCargoDesejado').textContent = dados.cargo || 'Cargo Desejado';
+
+    // Foto
+    if (dados.foto) {
+      document.getElementById('cvpFotoWrap').innerHTML =
+        `<img src="${dados.foto}" alt="Foto">`;
+    }
+
+    // Objetivo
+    document.getElementById('cvpObjetivo').textContent = dados.objetivo || '';
+
+    // Habilidades
+    const habsEl = document.getElementById('cvpHabilidades');
+    if (dados.habilidades) {
+      habsEl.innerHTML = dados.habilidades.split(',').map(h => `
+        <div class="cvp-skill-item">
+          <div class="cvp-skill-name">${h.trim()}</div>
+          <div class="cvp-skill-bg"><div class="cvp-skill-fill"></div></div>
+        </div>
+      `).join('');
+    } else {
+      habsEl.innerHTML = '<div class="cvp-s-text">—</div>';
+    }
+
+    // Idiomas
+    if (dados.idiomas) {
+      document.getElementById('cvpIdiomas').innerHTML =
+        dados.idiomas.split(',').map(i => `<div class="cvp-idioma-item">• ${i.trim()}</div>`).join('');
+      document.getElementById('secaoIdiomas').style.display = '';
+    }
+
+    // Experiências
+    const expEl = document.getElementById('cvpExperiencias');
+    if (dados.experiencias && dados.experiencias.some(e => e.cargo)) {
+      expEl.innerHTML = dados.experiencias
+        .filter(e => e.cargo || e.empresa)
+        .map(e => `
+          <div class="cvp-exp-item">
+            <div class="cvp-exp-cargo">${e.cargo || ''}</div>
+            <div class="cvp-exp-empresa">${e.empresa || ''}</div>
+            ${e.periodo ? `<div class="cvp-exp-periodo">${e.periodo}</div>` : ''}
+            ${e.desc    ? `<div class="cvp-exp-desc">${e.desc}</div>`      : ''}
+          </div>
+        `).join('');
+    } else {
+      expEl.innerHTML = '<div style="font-size:8.5px;color:#9CA3AF;font-style:italic">Não informado.</div>';
+    }
+
+    // Formação
+    const formEl = document.getElementById('cvpFormacao');
+    if (dados.formacao && dados.formacao.some(f => f.curso)) {
+      formEl.innerHTML = dados.formacao
+        .filter(f => f.curso)
+        .map(f => `
+          <div class="cvp-form-item">
+            <div class="cvp-form-curso">${f.curso}</div>
+            <div class="cvp-form-inst">${f.inst || ''}${f.periodo ? ' · ' + f.periodo : ''}</div>
+          </div>
+        `).join('');
+    } else {
+      formEl.innerHTML = '<div style="font-size:8.5px;color:#9CA3AF;font-style:italic">Não informado.</div>';
+    }
+  }
+
+  function preencherContato(icone) {
+    const contatoLista = document.getElementById('cvpContatoLista');
+    const linhas = [];
+    if (dados.telefone) linhas.push([icone.telefone, dados.telefone]);
+    if (dados.email)    linhas.push([icone.email,    dados.email]);
+    if (dados.cidade)   linhas.push([icone.cidade,   dados.cidade]);
+    if (dados.linkedin) linhas.push([icone.linkedin, dados.linkedin]);
+
+    if (linhas.length === 0) {
+      contatoLista.innerHTML = '<div class="cvp-s-text">—</div>';
+      return;
+    }
+
+    contatoLista.innerHTML = linhas.map(([ic, txt]) => `
+      <div class="cvp-icone-linha">
+        <span class="cvp-icone-emoji">${ic}</span>
+        <span class="cvp-s-text" style="word-break:break-all">${txt}</span>
+      </div>
+    `).join('');
+  }
+
+  // 
+  //  ZOOM
+  // 
+  function ajustarZoom(delta) {
+    estado.zoom = Math.max(30, Math.min(100, estado.zoom + delta));
+    aplicarEstado();
+  }
+
+  // 
+  //  CANVA BUTTON SDK
+  // 
+  async function abrirCanva() {
+    //  Substituir com seu API Key do Canva Button SDK:
+    // https://www.canva.com/developers/docs/button/
+    const CANVA_API_KEY = 'SEU_CANVA_API_KEY';
+
+    const btn = document.getElementById('btnCanva');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-hourglass"></i> Abrindo Canva...';
+
+    try {
+      // Verificar se SDK está carregado
+      if (typeof Canva === 'undefined') {
+        throw new Error('SDK não carregado');
+      }
+
+      const api = await Canva.Partnership.initialize({ apiKey: CANVA_API_KEY });
+
+      // Criar design no Canva com dados do currículo
+      await api.createDesign({
+        design: {
+          type:  'Resume',
+          title: `Currículo — ${dados.nome || 'FormaPrint BR'}`
+        },
+        onDesignPublish: ({ exportUrl, designId }) => {
+          // Usuário exportou do Canva — download direto
+          const a = document.createElement('a');
+          a.href     = exportUrl;
+          a.download = `curriculo-${(dados.nome || 'formaprintbr').toLowerCase().replace(/\s+/g,'-')}.pdf`;
+          a.click();
+          mostrarToast(' PDF exportado do Canva com sucesso!', 'success');
+        }
+      });
+
+    } catch (err) {
+      console.error('Canva SDK:', err);
+
+      // Fallback: abrir Canva com template URL (sem SDK)
+      const canvaSearchUrl = 'https://www.canva.com/search/templates?q=curriculo+profissional+simples';
+      const confirmar = confirm(
+        'O Canva Button SDK não está configurado ainda.\n\n' +
+        'Deseja abrir o Canva para escolher um template manualmente?\n' +
+        '(Depois configure sua API Key em personalizador.html)'
+      );
+      if (confirmar) window.open(canvaSearchUrl, '_blank');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg viewBox="0 0 100 100" fill="none" width="18" height="18">
+          <rect width="100" height="100" rx="22" fill="#7B61FF"/>
+          <path d="M50 18C32.3 18 18 32.3 18 50s14.3 32 32 32 32-14.3 32-32S67.7 18 50 18zm0 50c-9.9 0-18-8.1-18-18s8.1-18 18-18 18 8.1 18 18-8.1 18-18 18z" fill="white"/>
+        </svg>
+        Editar no Canva
+      `;
+    }
+  }
+
+  // 
+  //  GERAR PDF
+  // 
+  async function gerarPDF() {
+    const btn     = document.getElementById('btnDownloadFinal');
+    const loading = document.getElementById('pdfLoadingBar');
+
+    btn.disabled = true;
+    btn.textContent = '<i class="ph ph-hourglass"></i> Gerando...';
+    loading.classList.add('show');
+
+    // Resetar zoom para 100% antes de capturar
+    const zoomAnterior = estado.zoom;
+    document.getElementById('cvOuterWrap').style.transform = 'scale(1)';
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const cvEl = document.getElementById('cvPersonalizavel');
+
+      const canvas = await html2canvas(cvEl, {
+        scale:           2.2, // ~220dpi — qualidade de impressão
+        useCORS:         true,
+        allowTaint:      true,
+        backgroundColor: '#FFFFFF',
+        logging:         false,
+        imageTimeout:    15000
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf     = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pdfW    = pdf.internal.pageSize.getWidth();
+      const pdfH    = (canvas.height * pdfW) / canvas.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+
+      const nomeArq = (dados.nome || 'curriculo').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      pdf.save(`curriculo-${nomeArq}-formaprintbr.pdf`);
+
+      mostrarToast(' PDF gerado com sucesso!', 'success');
+
+    } catch (err) {
+      console.error('Erro ao gerar PDF:', err);
+      mostrarToast(' Erro ao gerar. Use Ctrl+P → Salvar como PDF.', 'error');
+    } finally {
+      // Restaurar zoom
+      estado.zoom = zoomAnterior;
+      document.getElementById('cvOuterWrap').style.transform = `scale(${zoomAnterior / 100})`;
+      btn.disabled = false;
+      btn.textContent = '<i class="ph ph-download-simple"></i> Baixar PDF profissional';
+      loading.classList.remove('show');
+    }
+  }
+
+  // 
+  //  TOAST
+  // 
+  function mostrarToast(msg, tipo = '') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className   = 'toast ' + tipo;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // 
+  //  INIT
+  // 
+  preencherCurriculo();
+  renderPainel();
+  aplicarEstado();
+</script>
+
+</body>
+</html>

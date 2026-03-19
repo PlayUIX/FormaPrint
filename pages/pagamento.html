@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagamento — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: var(--off); }
+    .pag-page { max-width: 560px; margin: 0 auto; padding: 100px 24px 60px; }
+
+    .pag-logo { text-align: center; margin-bottom: 28px; }
+
+    .pag-card {
+      background: var(--white); border-radius: 16px;
+      box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+    }
+    .pag-hd { background: var(--navy); padding: 20px 28px; }
+    .pag-hd h2 { color: var(--white); font-size: 1.2rem; margin-bottom: 4px; }
+    .pag-hd p  { color: rgba(255,255,255,.55); font-size: .82rem; }
+
+    /* Itens do pedido */
+    .pag-itens { padding: 20px 28px; border-bottom: 1px solid var(--off); }
+    .pag-item  { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: .88rem; }
+    .pag-item:not(:last-child) { border-bottom: 1px solid var(--off); }
+    .pag-item-nome  { color: var(--dark); }
+    .pag-item-preco { font-weight: 700; color: var(--navy); }
+    .pag-item-preco.gratis { color: #16a34a; }
+    .pag-item-preco.desconto { color: #EF4444; text-decoration: line-through; font-weight: 400; }
+
+    /* Upsells */
+    .upsell-box { padding: 16px 28px; background: rgba(212,175,55,.04); border-bottom: 1px solid var(--off); }
+    .upsell-title { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray); margin-bottom: 10px; }
+    .upsell-opcao {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border: 1.5px solid var(--light);
+      border-radius: 10px; cursor: pointer; background: var(--white);
+      transition: all var(--t); margin-bottom: 8px; user-select: none;
+    }
+    .upsell-opcao:hover { border-color: var(--gold); }
+    .upsell-opcao.selecionado { border-color: var(--gold); background: rgba(212,175,55,.06); }
+    .upsell-opcao input[type=checkbox] { accent-color: var(--gold); width: 16px; height: 16px; flex-shrink: 0; }
+    .upsell-opcao-info { flex: 1; }
+    .upsell-opcao-info strong { display: block; font-size: .85rem; color: var(--navy); margin-bottom: 1px; }
+    .upsell-opcao-info span  { font-size: .75rem; color: var(--gray); }
+    .upsell-preco { font-weight: 700; color: var(--gold2); font-size: .88rem; white-space: nowrap; }
+
+    /* Cupom */
+    .cupom-box { padding: 16px 28px; border-bottom: 1px solid var(--off); }
+    .cupom-row { display: flex; gap: 8px; }
+    .cupom-input {
+      flex: 1; padding: 10px 13px; border: 1.5px solid var(--light);
+      border-radius: 8px; font-family: var(--body); font-size: .86rem;
+      text-transform: uppercase; outline: none; transition: border-color var(--t);
+    }
+    .cupom-input:focus { border-color: var(--navy); }
+    .cupom-btn {
+      background: var(--navy); color: var(--white); font-weight: 700;
+      padding: 10px 18px; border-radius: 8px; border: none;
+      cursor: pointer; font-family: var(--body); font-size: .85rem;
+      transition: background var(--t); white-space: nowrap;
+    }
+    .cupom-btn:hover { background: var(--navy2); }
+    .cupom-status { margin-top: 7px; font-size: .78rem; }
+    .cupom-status.ok  { color: #16a34a; }
+    .cupom-status.err { color: #EF4444; }
+
+    /* Total */
+    .pag-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 28px;
+    }
+    .pag-total-label { font-weight: 700; color: var(--navy); font-size: .9rem; }
+    .pag-total-val   { font-family: var(--display); font-size: 1.8rem; color: var(--gold2); font-weight: 700; }
+
+    /* Botões de pagamento */
+    .pag-btns { padding: 0 28px 24px; display: flex; flex-direction: column; gap: 10px; }
+    .btn-pix {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: #00a650; color: var(--white); font-weight: 700; font-size: .95rem;
+      padding: 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-family: var(--body); transition: all var(--t); text-decoration: none;
+    }
+    .btn-pix:hover { background: #007a3d; transform: translateY(-1px); }
+    .btn-card {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: #009ee3; color: var(--white); font-weight: 700; font-size: .95rem;
+      padding: 14px; border-radius: 10px; border: none; cursor: pointer;
+      font-family: var(--body); transition: all var(--t); text-decoration: none;
+    }
+    .btn-card:hover { background: #007ab8; transform: translateY(-1px); }
+    .pag-sep { display: flex; align-items: center; gap: 10px; font-size: .72rem; color: var(--gray); }
+    .pag-sep::before,.pag-sep::after { content:''; flex:1; height:1px; background:var(--light); }
+
+    /* Segurança */
+    .pag-seg { text-align: center; padding: 0 28px 20px; font-size: .75rem; color: var(--gray); }
+    .pag-seg-icons { display: flex; justify-content: center; gap: 18px; margin-top: 8px; font-size: .72rem; color: var(--gray); }
+    .pag-seg-icons span { display: flex; align-items: center; gap: 4px; }
+
+    /* Tela de sucesso */
+    .pag-sucesso { display: none; padding: 40px 28px; text-align: center; }
+    .pag-sucesso-icon { font-size: 3.5rem; color: #16a34a; margin-bottom: 16px; }
+    .pag-sucesso h2 { color: var(--navy); margin-bottom: 10px; }
+    .pag-sucesso p  { margin-bottom: 24px; }
+
+    .pag-voltar { text-align: center; font-size: .82rem; color: var(--gray); margin-top: 12px; }
+    .pag-voltar a { color: var(--navy); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="pag-page">
+    <div class="pag-logo">
+      <a href="../index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+    </div>
+
+    <div class="pag-card" id="pagCard">
+      <div class="pag-hd">
+        <h2>Finalizar compra</h2>
+        <p>Seu currículo profissional está pronto — pague para liberar o download</p>
+      </div>
+
+      <!-- Itens -->
+      <div class="pag-itens" id="pagItens">
+        <div class="pag-item">
+          <span class="pag-item-nome">Currículo Profissional — Modelo Clássico Dourado</span>
+          <span class="pag-item-preco" id="precoBase">R$ 2,50</span>
+        </div>
+        <div class="pag-item">
+          <span class="pag-item-nome">PDF em alta qualidade</span>
+          <span class="pag-item-preco gratis">Incluso</span>
+        </div>
+        <div class="pag-item">
+          <span class="pag-item-nome">Foto 3×4 pela câmera</span>
+          <span class="pag-item-preco gratis">Incluso</span>
+        </div>
+        <div class="pag-item">
+          <span class="pag-item-nome">QR Code no currículo</span>
+          <span class="pag-item-preco gratis">Incluso</span>
+        </div>
+        <div class="pag-item">
+          <span class="pag-item-nome">5 envios para empresas</span>
+          <span class="pag-item-preco gratis">Incluso</span>
+        </div>
+        <div class="pag-item">
+          <span class="pag-item-nome">Link de indicação (indique e ganhe)</span>
+          <span class="pag-item-preco gratis">Incluso</span>
+        </div>
+        <!-- Upsells selecionados aparecem aqui -->
+        <div id="upsell-itens"></div>
+        <!-- Desconto cupom/fidelidade -->
+        <div class="pag-item" id="desconto-row" style="display:none">
+          <span class="pag-item-nome" id="desconto-label">Desconto fidelidade</span>
+          <span class="pag-item-preco" style="color:#16a34a" id="desconto-val">−R$1,00</span>
+        </div>
+      </div>
+
+      <!-- Upsells -->
+      <div class="upsell-box">
+        <div class="upsell-title">Adicionar ao pedido</div>
+        <label class="upsell-opcao" id="up-carta">
+          <input type="checkbox" value="1.00" data-nome="Carta de Apresentação com IA" onchange="recalcular()">
+          <div class="upsell-opcao-info">
+            <strong>Carta de Apresentação</strong>
+            <span>IA gera uma carta personalizada para a vaga — aumenta muito as chances</span>
+          </div>
+          <span class="upsell-preco">+ R$1,00</span>
+        </label>
+        <label class="upsell-opcao" id="up-ingles">
+          <input type="checkbox" value="1.50" data-nome="Currículo em Inglês" onchange="recalcular()">
+          <div class="upsell-opcao-info">
+            <strong>Currículo em Inglês</strong>
+            <span>IA traduz e adapta para inglês profissional</span>
+          </div>
+          <span class="upsell-preco">+ R$1,50</span>
+        </label>
+        <label class="upsell-opcao" id="up-envios">
+          <input type="checkbox" value="1.00" data-nome="Envios ilimitados por 7 dias" onchange="recalcular()">
+          <div class="upsell-opcao-info">
+            <strong>Envios ilimitados por 7 dias</strong>
+            <span>Envie para quantas empresas quiser</span>
+          </div>
+          <span class="upsell-preco">+ R$1,00</span>
+        </label>
+      </div>
+
+      <!-- Cupom de desconto -->
+      <div class="cupom-box">
+        <div style="font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:8px">Tem um cupom de desconto?</div>
+        <div class="cupom-row">
+          <input type="text" id="cupomInput" class="cupom-input" placeholder="CUPOM-XXXXXX">
+          <button class="cupom-btn" onclick="aplicarCupom()">Aplicar</button>
+        </div>
+        <div class="cupom-status" id="cupomStatus"></div>
+      </div>
+
+      <!-- Total -->
+      <div class="pag-total">
+        <span class="pag-total-label">Total</span>
+        <span class="pag-total-val" id="totalVal">R$ 2,50</span>
+      </div>
+
+      <!-- Botões de pagamento -->
+      <div class="pag-btns">
+        <a id="btnPix"  href="#" class="btn-pix"  onclick="irPagar('pix',event)">
+          <i class="ph-bold ph-lightning"></i> Pagar com Pix — mais rápido
+        </a>
+        <div class="pag-sep">ou</div>
+        <a id="btnCard" href="#" class="btn-card" onclick="irPagar('cartao',event)">
+          <i class="ph-bold ph-credit-card"></i> Cartão ou Boleto
+        </a>
+      </div>
+
+      <div class="pag-seg">
+        <div>Pagamento 100% seguro via Mercado Pago</div>
+        <div class="pag-seg-icons">
+          <span><i class="ph ph-lock-simple"></i> SSL</span>
+          <span><i class="ph ph-shield-check"></i> Antifraude</span>
+          <span><i class="ph ph-seal-check"></i> Mercado Pago</span>
+        </div>
+      </div>
+
+      <!-- Tela de sucesso -->
+      <div class="pag-sucesso" id="pagSucesso">
+        <div class="pag-sucesso-icon"><i class="ph-bold ph-check-circle"></i></div>
+        <h2>Pagamento confirmado!</h2>
+        <p>Seu currículo está liberado. Clique para personalizar e baixar.</p>
+        <a href="personalizador.html" class="btn-primary" style="display:inline-flex;margin:0 auto">
+          <i class="ph-bold ph-palette"></i> Personalizar e baixar →
+        </a>
+      </div>
+    </div>
+
+    <div class="pag-voltar"><a href="editor.html">← Voltar ao editor</a></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    //  Configuração dos links Mercado Pago 
+    //  Substitua com seus links reais: mercadopago.com.br/cobrar
+    const LINKS_MP = {
+      pix_250:    'LINK_MP_PIX_250',
+      cartao_250: 'LINK_MP_CARTAO_250',
+      pix_150:    'LINK_MP_PIX_150',
+      cartao_150: 'LINK_MP_CARTAO_150',
+    };
+
+    //  Estado 
+    let precoBase    = 2.50;
+    let cupomAplicado = false;
+    let descontoVal  = 0;
+    let descontoLabel= '';
+    let refCode      = localStorage.getItem('fpbr_ref_code') || '';
+
+    // Verificar fidelidade
+    const ehRecorrente = localStorage.getItem('fpbr_recorrente') === 'true';
+    if (ehRecorrente) {
+      precoBase = 1.50;
+      document.getElementById('precoBase').innerHTML = '<span style="color:#9CA3AF;text-decoration:line-through;font-weight:400">R$2,50</span>&nbsp;R$1,50';
+      document.getElementById('desconto-row').style.display = 'flex';
+      document.getElementById('desconto-label').textContent = 'Desconto fidelidade';
+      document.getElementById('desconto-val').textContent   = '−R$1,00';
+    }
+
+    // Verificar retorno do MP com status aprovado
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('collection_status') === 'approved' || p.get('status') === 'approved') {
+      mostrarSucesso();
+    }
+
+    recalcular();
+
+    //  Recalcular total 
+    function recalcular() {
+      let total = precoBase;
+      const itensEl = document.getElementById('upsell-itens');
+      itensEl.innerHTML = '';
+
+      document.querySelectorAll('.upsell-opcao input[type=checkbox]').forEach(cb => {
+        const label = cb.closest('.upsell-opcao');
+        label.classList.toggle('selecionado', cb.checked);
+        if (cb.checked) {
+          total += parseFloat(cb.value);
+          itensEl.innerHTML += `
+            <div class="pag-item">
+              <span class="pag-item-nome">${cb.dataset.nome}</span>
+              <span class="pag-item-preco">R$ ${parseFloat(cb.value).toFixed(2).replace('.',',')}</span>
+            </div>`;
+        }
+      });
+
+      if (cupomAplicado) total = Math.max(0, total - descontoVal);
+      total = Math.max(0, total);
+
+      document.getElementById('totalVal').textContent = 'R$ ' + total.toFixed(2).replace('.',',');
+      localStorage.setItem('fpbr_total_pagar', total.toFixed(2));
+    }
+
+    //  Cupom 
+    function aplicarCupom() {
+      const cupom = document.getElementById('cupomInput').value.trim().toUpperCase();
+      const status = document.getElementById('cupomStatus');
+
+      // Cupom de fidelidade gerado automaticamente
+      if (cupom.startsWith('FPB-') && cupom.length === 12) {
+        cupomAplicado = true; descontoVal = 1.00;
+        descontoLabel = 'Cupom de fidelidade';
+        status.textContent = 'Cupom aplicado! Desconto de R$1,00.'; status.className = 'cupom-status ok';
+        document.getElementById('desconto-row').style.display = 'flex';
+        document.getElementById('desconto-label').textContent = descontoLabel;
+        document.getElementById('desconto-val').textContent   = '−R$1,00';
+        recalcular(); return;
+      }
+
+      // Cupom de indicação
+      if (cupom.startsWith('GRATIS-') && cupom.length >= 13) {
+        cupomAplicado = true; descontoVal = 2.50;
+        descontoLabel = 'Crédito de indicação';
+        status.textContent = 'Cupom de indicação válido! Currículo grátis.'; status.className = 'cupom-status ok';
+        document.getElementById('desconto-row').style.display = 'flex';
+        document.getElementById('desconto-label').textContent = descontoLabel;
+        document.getElementById('desconto-val').textContent   = '−R$2,50';
+        recalcular(); return;
+      }
+
+      status.textContent = 'Cupom inválido ou já utilizado.'; status.className = 'cupom-status err';
+    }
+
+    //  Ir para pagamento 
+    function irPagar(tipo, event) {
+      event.preventDefault();
+      const total = parseFloat(document.getElementById('totalVal').textContent.replace('R$ ','').replace(',','.'));
+
+      // Se total for 0 (cupom de indicação), liberar direto
+      if (total <= 0) {
+        sessionStorage.setItem('fpbr_pago', 'true');
+        localStorage.setItem('fpbr_pago', 'true');
+        mostrarSucesso(); return;
+      }
+
+      // Salvar upsells selecionados
+      const selecionados = [];
+      document.querySelectorAll('.upsell-opcao input:checked').forEach(cb => {
+        selecionados.push(cb.dataset.nome);
+      });
+      localStorage.setItem('fpbr_upsells', JSON.stringify(selecionados));
+
+      // Escolher link do Mercado Pago
+      const linkKey = `${tipo}_${precoBase <= 1.50 ? '150' : '250'}`;
+      const link    = LINKS_MP[linkKey.replace('pix','pix').replace('cartao','cartao')];
+
+      if (!link || link.includes('LINK_MP')) {
+        // Modo desenvolvimento
+        const confirmar = confirm('Desenvolvimento: simular pagamento aprovado?');
+        if (confirmar) {
+          sessionStorage.setItem('fpbr_pago', 'true');
+          localStorage.setItem('fpbr_pago', 'true');
+          // Gerar cupom de fidelidade
+          const codigo = 'FPB-' + Math.random().toString(36).substring(2,10).toUpperCase();
+          localStorage.setItem('fpbr_cupom_fidelidade', codigo);
+          mostrarSucesso();
+        }
+        return;
+      }
+
+      window.location.href = link;
+    }
+
+    function mostrarSucesso() {
+      // Gerar cupom de fidelidade e link de indicação
+      if (!localStorage.getItem('fpbr_cupom_fidelidade')) {
+        const cupom = 'FPB-' + Math.random().toString(36).substring(2,10).toUpperCase();
+        localStorage.setItem('fpbr_cupom_fidelidade', cupom);
+      }
+
+      document.querySelectorAll('.pag-hd,.pag-itens,.upsell-box,.cupom-box,.pag-total,.pag-btns,.pag-seg').forEach(el => {
+        el.style.display = 'none';
+      });
+      document.getElementById('pagSucesso').style.display = 'block';
+    }
+
+    function toast(msg, tipo='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + tipo;
+      void t.offsetWidth; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

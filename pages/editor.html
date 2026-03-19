@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Currículo — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: #f0ede6; }
+
+    /*  Layout principal  */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 520px 1fr;
+      min-height: 100vh;
+    }
+
+    /*  Coluna formulário  */
+    .form-col {
+      background: var(--white);
+      box-shadow: 2px 0 20px rgba(0,0,0,0.07);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .form-col-header {
+      background: var(--navy);
+      padding: 16px 28px;
+      flex-shrink: 0;
+    }
+    .form-col-header .logo { display: block; margin-bottom: 14px; }
+    .form-col-body {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .form-col-footer {
+      padding: 16px 28px;
+      border-top: 1px solid var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    /*  Stepper  */
+    .stepper {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      flex: 1;
+    }
+    .step-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      right: -50%;
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      z-index: 0;
+    }
+    .step-item.done:not(:last-child)::after { background: var(--gold); }
+    .step-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      position: relative;
+      z-index: 1;
+      transition: all 0.2s;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .step-item.active .step-circle {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+    .step-item.done .step-circle {
+      background: rgba(212,175,55,0.25);
+      color: var(--gold);
+      border-color: rgba(212,175,55,0.5);
+    }
+    .step-label {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.35);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .step-item.active .step-label { color: var(--gold); }
+    .step-item.done  .step-label  { color: rgba(255,255,255,0.55); }
+
+    .progress-bar-wrap {
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      margin-top: 14px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /*  Etapas  */
+    .etapa {
+      display: none;
+      padding: 28px 28px 12px;
+      animation: etapaIn 0.22s ease;
+    }
+    .etapa.ativa { display: block; }
+    @keyframes etapaIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .etapa-titulo { font-family: var(--font-display); font-size: 1.25rem; color: var(--navy); margin-bottom: 3px; }
+    .etapa-sub    { font-size: 0.82rem; color: var(--gray); margin-bottom: 22px; }
+
+    /* Formulário */
+    .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .foto-area {
+      border: 2px dashed var(--light);
+      border-radius: 12px;
+      padding: 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--trans);
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .foto-area:hover { border-color: var(--navy); }
+    .foto-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .foto-thumb {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 8px;
+      display: none;
+      border: 3px solid var(--gold);
+    }
+    .foto-area-icon  { font-size: 1.8rem; margin-bottom: 6px; }
+    .foto-area-label { font-size: 0.8rem; color: var(--gray); }
+
+    /* Blocos dinâmicos */
+    .bloco {
+      background: var(--off);
+      border: 1px solid var(--light);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      position: relative;
+      animation: blocoIn 0.18s ease;
+    }
+    @keyframes blocoIn {
+      from { opacity:0; transform:scale(0.97); }
+      to   { opacity:1; transform:scale(1); }
+    }
+    .bloco-num { font-size: 0.7rem; font-weight: 700; color: var(--gold2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+    .bloco-del { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #EF4444; font-size: 0.9rem; cursor: pointer; padding: 3px 8px; border-radius: 6px; transition: background var(--trans); }
+    .bloco-del:hover { background: rgba(239,68,68,0.1); }
+
+    .btn-add {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: rgba(27,42,74,0.05);
+      border: 1.5px dashed rgba(27,42,74,0.2);
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all var(--trans);
+      margin-bottom: 8px;
+    }
+    .btn-add:hover { background: rgba(27,42,74,0.09); border-color: var(--navy); }
+
+    /* Habilidades chips */
+    .habs-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .hab-chip {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(27,42,74,0.08);
+      border-radius: 100px;
+      padding: 5px 11px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .hab-chip button { background: none; border: none; cursor: pointer; color: var(--gray); font-size: 0.78rem; }
+    .hab-chip button:hover { color: #EF4444; }
+
+    .sugestoes-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .sug-btn {
+      font-size: 0.75rem;
+      padding: 4px 11px;
+      border: 1.5px solid var(--light);
+      border-radius: 100px;
+      background: var(--white);
+      color: var(--dark);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .sug-btn:hover { border-color: var(--navy); background: rgba(27,42,74,0.04); }
+
+    /* Dica box */
+    .dica {
+      background: rgba(212,175,55,0.07);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.8rem;
+      color: var(--dark);
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    /* Preço/login card na etapa 5 */
+    .login-preco-card {
+      background: var(--off);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .login-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--light);
+    }
+    .preco-row { display: flex; align-items: center; justify-content: space-between; }
+    .preco-row .preco-val { font-family: var(--font-display); font-size: 1.5rem; color: var(--gold); font-weight: 700; }
+    .fidelidade-chip { font-size: 0.65rem; font-weight: 700; background: var(--gold); color: var(--navy); padding: 2px 8px; border-radius: 100px; display: none; }
+
+    /* Status de auto-save */
+    .save-st { display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: var(--gray); }
+    .save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--light); transition: background 0.3s; }
+    .save-dot.salvo    { background: #16a34a; }
+    .save-dot.salvando { background: var(--gold); animation: pulse .6s ease infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* Botões de navegação */
+    .nav-btns { display: flex; gap: 10px; }
+    .btn-ant  { background: var(--off); border: 1.5px solid var(--light); color: var(--dark); font-weight: 700; padding: 11px 20px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-size: 0.9rem; transition: all var(--trans); }
+    .btn-ant:hover { background: var(--light); }
+    .btn-prox { background: var(--navy); color: var(--white); font-weight: 700; padding: 11px 24px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-size: 0.9rem; border: none; transition: all var(--trans); }
+    .btn-prox:hover { background: var(--navy2); }
+    .btn-pagar { background: var(--gold); color: var(--navy); font-weight: 700; padding: 11px 28px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-size: 0.95rem; border: none; transition: all var(--trans); }
+    .btn-pagar:hover { background: var(--gold2); }
+
+    /*  Coluna de prévia  */
+    .preview-col {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px 20px 60px; gap: 16px;
+    }
+    .preview-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 620px;
+    }
+    .preview-lbl { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray); }
+    .zoom-row { display: flex; align-items: center; gap: 8px; background: var(--white); border-radius: 8px; padding: 6px 12px; box-shadow: var(--shadow2); }
+    .zoom-row button { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--navy); padding: 2px 5px; }
+    .zoom-val { font-size: 0.82rem; font-weight: 700; color: var(--navy); min-width: 36px; text-align: center; }
+
+    .cv-outer { transform-origin: top center; transition: transform .2s ease; }
+    .cv-shadow { box-shadow: 0 16px 60px rgba(0,0,0,0.18); border-radius: 4px; overflow: hidden; }
+
+    /* Currículo A4 */
+    #cvPreview {
+      width: 595px; min-height: 842px;
+      background: #fff;
+      display: flex;
+      font-family: 'Lato', Arial, sans-serif;
+    }
+    .cvp-sidebar { width: 185px; background: #1B2A4A; flex-shrink: 0; display: flex; flex-direction: column; }
+    .cvp-sidebar-top { background: #243660; padding: 28px 18px 20px; }
+    .cvp-foto-wrap {
+      width: 88px; height: 88px; border-radius: 50%; overflow: hidden;
+      margin: 0 auto 14px; border: 3px solid rgba(212,175,55,.5);
+      background: rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,.3); font-size: 2rem;
+    }
+    .cvp-foto-wrap img { width:100%; height:100%; object-fit:cover; }
+    .cvp-s-group { padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.1); }
+    .cvp-s-label { display: block; font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #D4AF37; margin-bottom: 8px; }
+    .cvp-s-text { font-size: 8.5px; color: rgba(255,255,255,.8); line-height: 1.65; word-break: break-all; }
+    .cvp-skill-item { margin-bottom: 7px; }
+    .cvp-skill-name { font-size: 8px; color: rgba(255,255,255,.85); margin-bottom: 3px; }
+    .cvp-skill-bg  { background: rgba(255,255,255,.15); border-radius: 2px; height: 3.5px; }
+    .cvp-skill-fill{ background: #D4AF37; border-radius: 2px; height: 3.5px; width: 80%; }
+    .cvp-idioma    { font-size: 8px; color: rgba(255,255,255,.8); margin-bottom: 3px; }
+
+    .cvp-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .cvp-main-header { background: #1B2A4A; padding: 28px 22px 18px; }
+    .cvp-nome  { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 5px; }
+    .cvp-cargo { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: rgba(255,255,255,.7); }
+    .cvp-divisor { height: 2px; background: #D4AF37; margin: 0 22px; }
+    .cvp-body  { flex: 1; padding: 16px 22px; }
+    .cvp-section { margin-bottom: 14px; }
+    .cvp-section-title { display: block; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #1B2A4A; margin-bottom: 9px; padding-bottom: 4px; border-bottom: 1.5px solid #D4AF37; }
+    .cvp-objetivo  { font-size: 9px; line-height: 1.65; color: #4B5563; }
+    .cvp-exp-item  { margin-bottom: 11px; padding-left: 10px; border-left: 2px solid #D4AF37; }
+    .cvp-exp-cargo   { font-size: 9.5px; font-weight: 700; color: #1B2A4A; margin-bottom: 2px; }
+    .cvp-exp-empresa { font-size: 8.5px; font-weight: 700; color: #B8960C; margin-bottom: 2px; }
+    .cvp-exp-periodo { font-size: 7.5px; color: #6B7280; margin-bottom: 3px; }
+    .cvp-exp-desc    { font-size: 8.5px; line-height: 1.5; color: #4B5563; }
+    .cvp-form-item { margin-bottom: 9px; }
+    .cvp-form-curso{ font-size: 9.5px; font-weight: 700; color: #1B2A4A; }
+    .cvp-form-inst { font-size: 8px; color: #6B7280; }
+    .cvp-watermark { text-align: center; font-size: 6.5px; color: rgba(0,0,0,.15); padding: 8px; }
+
+    /* Responsivo */
+    @media (max-width: 960px) {
+      .editor-layout { grid-template-columns: 1fr; }
+      .form-col { height: auto; position: static; overflow: visible; }
+      .form-col-body { overflow: visible; }
+      .preview-col { padding: 20px 12px 40px; }
+      #cvPreview { width: 100%; max-width: 595px; }
+      .cv-outer { transform: none !important; }
+    }
+    @media (max-width: 540px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+</head>
+<body>
+
+<div class="editor-layout">
+
+  <!--  COLUNA FORMULÁRIO  -->
+  <aside class="form-col">
+
+    <div class="form-col-header">
+      <a href="../index.html" class="logo">
+        <span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span>
+      </a>
+      <!-- Stepper -->
+      <div class="stepper" id="stepper">
+        <div class="step-item active" data-step="1"><div class="step-circle">1</div><span class="step-label">Dados</span></div>
+        <div class="step-item" data-step="2"><div class="step-circle">2</div><span class="step-label">Objetivo</span></div>
+        <div class="step-item" data-step="3"><div class="step-circle">3</div><span class="step-label">Exp.</span></div>
+        <div class="step-item" data-step="4"><div class="step-circle">4</div><span class="step-label">Formação</span></div>
+        <div class="step-item" data-step="5"><div class="step-circle">5</div><span class="step-label">Habilidades</span></div>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progBar" style="width:20%"></div></div>
+    </div>
+
+    <div class="form-col-body">
+
+      <!-- ETAPA 1 -->
+      <div class="etapa ativa" id="etapa-1">
+        <div class="etapa-titulo">Dados pessoais</div>
+        <div class="etapa-sub">Informações básicas de contato e identificação</div>
+
+        <div class="foto-area" id="fotoArea">
+          <input type="file" id="fotoInput" accept="image/*" onchange="carregarFoto(this)">
+          <img class="foto-thumb" id="fotoThumb" src="" alt="Foto">
+          <div class="foto-area-icon" id="fotoIcon"><i class="ph ph-camera"></i></div>
+          <div class="foto-area-label" id="fotoLabel">Adicionar foto (opcional)</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Nome completo *</label><input type="text" id="f-nome" placeholder="Maria da Silva" oninput="auto();prev()"></div>
+          <div class="form-group"><label>Cargo desejado *</label><input type="text" id="f-cargo" placeholder="Auxiliar Administrativo" oninput="auto();prev()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="f-tel" placeholder="(98) 99999-0000" oninput="auto();prev()"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="f-email" placeholder="seu@email.com" oninput="auto();prev()"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Cidade</label><input type="text" id="f-cidade" placeholder="São Luís" oninput="auto();prev()"></div>
+          <div class="form-group"><label>Estado (sigla)</label><input type="text" id="f-estado" placeholder="MA" maxlength="2" oninput="auto();prev()"></div>
+        </div>
+        <div class="form-group"><label>LinkedIn (opcional)</label><input type="text" id="f-linkedin" placeholder="linkedin.com/in/seu-nome" oninput="auto()"></div>
+      </div>
+
+      <!-- ETAPA 2 -->
+      <div class="etapa" id="etapa-2">
+        <div class="etapa-titulo">Objetivo profissional</div>
+        <div class="etapa-sub">Descreva o que você busca na próxima oportunidade</div>
+        <div class="form-group">
+          <label>Objetivo / Resumo *</label>
+          <textarea id="f-objetivo" rows="5" placeholder="Ex: Profissional dedicado buscando oportunidade em atendimento ao cliente onde possa aplicar minha experiência e contribuir para o crescimento da empresa..." oninput="auto();prev()"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Área principal de atuação</label>
+          <select id="f-area" onchange="auto()">
+            <option value="">Selecione...</option>
+            <option>Administrativo</option>
+            <option>Atendimento ao Cliente</option>
+            <option>Comércio e Varejo</option>
+            <option>Construção Civil</option>
+            <option>Saúde</option>
+            <option>Logística e Transporte</option>
+            <option>Tecnologia da Informação</option>
+            <option>Alimentação e Gastronomia</option>
+            <option>Beleza e Estética</option>
+            <option>Serviços Gerais</option>
+            <option>Educação</option>
+            <option>Segurança</option>
+          </select>
+        </div>
+        <div class="dica"> <strong>Dica:</strong> Seja específico sobre o cargo e mencione 1–2 qualidades que te diferenciam. Evite frases genéricas como "busco crescimento profissional".</div>
+      </div>
+
+      <!-- ETAPA 3 -->
+      <div class="etapa" id="etapa-3">
+        <div class="etapa-titulo">Experiências profissionais</div>
+        <div class="etapa-sub">Adicione as mais recentes primeiro</div>
+        <div id="exp-container"></div>
+        <button class="btn-add" onclick="addExp()"> Adicionar experiência</button>
+        <div class="dica" style="background:rgba(27,42,74,0.04);border-color:rgba(27,42,74,0.1)">Sem experiência formal? Inclua trabalhos informais, bicos, voluntariado ou atividades de escola técnica.</div>
+      </div>
+
+      <!-- ETAPA 4 -->
+      <div class="etapa" id="etapa-4">
+        <div class="etapa-titulo">Formação acadêmica</div>
+        <div class="etapa-sub">Inclua desde ensino médio até cursos livres e certificados</div>
+        <div id="form-container"></div>
+        <button class="btn-add" onclick="addFormacao()"> Adicionar formação</button>
+        <div class="dica" style="background:rgba(27,42,74,0.04);border-color:rgba(27,42,74,0.1)">Inclua cursos do SENAI, SENAC, EAD, técnicos e qualquer certificado relevante para a vaga.</div>
+      </div>
+
+      <!-- ETAPA 5 -->
+      <div class="etapa" id="etapa-5">
+        <div class="etapa-titulo">Habilidades e idiomas</div>
+        <div class="etapa-sub">Liste suas principais competências técnicas e comportamentais</div>
+
+        <div class="form-group">
+          <label>Adicionar habilidade (Enter ou vírgula para confirmar)</label>
+          <input type="text" id="f-hab-input" placeholder="Ex: Pacote Office, Excel, Vendas..."
+            onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();addHab()}">
+          <div class="habs-chips" id="habs-chips"></div>
+        </div>
+
+        <div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:8px">Sugestões rápidas:</div>
+          <div class="sugestoes-wrap" id="sugestoes"></div>
+        </div>
+
+        <div class="form-group" style="margin-top:20px">
+          <label>Idiomas</label>
+          <input type="text" id="f-idiomas" placeholder="Português (Nativo), Inglês (Básico)" oninput="auto();prev()">
+        </div>
+
+        <div class="login-preco-card">
+          <div class="login-row">
+            <span style="font-size:1.1rem"><i class="ph ph-user"></i></span>
+            <span id="login-nome" style="font-size:.85rem;color:var(--dark);font-weight:700">Entrar com Google para desconto de fidelidade</span>
+            <button id="login-btn" onclick="fazerLogin()" style="margin-left:auto;font-size:.78rem;font-weight:700;color:var(--gold2);background:none;border:none;cursor:pointer">Entrar</button>
+          </div>
+          <div class="preco-row">
+            <div>
+              <div style="font-size:.7rem;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Valor do currículo</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="preco-val" id="precoVal">R$ 2,50</span>
+                <span class="fidelidade-chip" id="fidelChip"><i class="ph ph-heart"></i> Fidelidade</span>
+              </div>
+            </div>
+            <div style="font-size:.72rem;color:var(--gray);text-align:right;line-height:1.5">Cores e fontes<br>personalizáveis após o pagamento</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-col-body -->
+
+    <div class="form-col-footer">
+      <div class="save-st"><div class="save-dot" id="saveDot"></div><span id="saveTxt">Rascunho</span></div>
+      <div class="nav-btns">
+        <button class="btn-ant" id="btnAnt" onclick="etapaAnt()" style="display:none">← Anterior</button>
+        <button class="btn-prox" id="btnProx" onclick="etapaProx()">Próximo →</button>
+        <button class="btn-pagar" id="btnPagar" onclick="irPagar()" style="display:none">Pagar R$<span id="precoBtn">2,50</span> →</button>
+      </div>
+    </div>
+  </aside>
+
+  <!--  PRÉVIA  -->
+  <main class="preview-col">
+    <div class="preview-topbar">
+      <span class="preview-lbl">Prévia em tempo real</span>
+      <div class="zoom-row">
+        <button onclick="z(-10)">−</button>
+        <span class="zoom-val" id="zoomVal">58%</span>
+        <button onclick="z(+10)">+</button>
+      </div>
+    </div>
+
+    <div class="cv-outer" id="cvOuter">
+      <div class="cv-shadow">
+        <div id="cvPreview">
+          <div class="cvp-sidebar">
+            <div class="cvp-sidebar-top">
+              <div class="cvp-foto-wrap" id="cv-foto"><i class="ph ph-user"></i></div>
+            </div>
+            <div class="cvp-s-group">
+              <span class="cvp-s-label">Contato</span>
+              <div id="cv-contato"></div>
+            </div>
+            <div class="cvp-s-group">
+              <span class="cvp-s-label">Habilidades</span>
+              <div id="cv-habs"></div>
+            </div>
+            <div class="cvp-s-group" id="cv-idiomas-sec" style="display:none">
+              <span class="cvp-s-label">Idiomas</span>
+              <div id="cv-idiomas"></div>
+            </div>
+          </div>
+          <div class="cvp-main">
+            <div class="cvp-main-header">
+              <div class="cvp-nome"  id="cv-nome">Seu Nome Completo</div>
+              <div class="cvp-cargo" id="cv-cargo">Cargo Desejado</div>
+            </div>
+            <div class="cvp-divisor"></div>
+            <div class="cvp-body">
+              <div class="cvp-section">
+                <span class="cvp-section-title">Objetivo Profissional</span>
+                <div class="cvp-objetivo" id="cv-objetivo">Preencha o formulário ao lado para ver a prévia em tempo real.</div>
+              </div>
+              <div class="cvp-section">
+                <span class="cvp-section-title">Experiências Profissionais</span>
+                <div id="cv-exp"><div style="font-size:9px;color:#9CA3AF;font-style:italic">Adicione na etapa 3.</div></div>
+              </div>
+              <div class="cvp-section">
+                <span class="cvp-section-title">Formação Acadêmica</span>
+                <div id="cv-form"><div style="font-size:9px;color:#9CA3AF;font-style:italic">Adicione na etapa 4.</div></div>
+              </div>
+            </div>
+            <div class="cvp-watermark">formaprintbr.com.br</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  //  Substitua com sua configuração do Firebase Console
+  const firebaseConfig = {
+    apiKey:            "SUA_API_KEY",
+    authDomain:        "SEU_PROJETO.firebaseapp.com",
+    projectId:         "SEU_PROJETO",
+    storageBucket:     "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId:             "SEU_APP_ID"
+  };
+
+  let auth, db;
+  try {
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db   = getFirestore(app);
+  } catch(e) { console.warn('Firebase config pendente:', e.message); }
+
+  const provider = new GoogleAuthProvider();
+
+  window.fazerLogin = async () => {
+    if (!auth) { mostrarToast('Configure o Firebase primeiro.', 'error'); return; }
+    try { await signInWithPopup(auth, provider); }
+    catch(e) { console.warn('Login cancelado:', e.message); }
+  };
+
+  window.salvarFirebase = async (dados) => {
+    if (!auth?.currentUser || !db) return;
+    try {
+      await setDoc(doc(db, 'curriculos', auth.currentUser.uid), {
+        ...dados, atualizadoEm: new Date().toISOString()
+      }, { merge: true });
+    } catch(e) { console.warn('Firestore:', e.message); }
+  };
+
+  if (auth) {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('login-nome').textContent = user.displayName || user.email;
+        document.getElementById('login-btn').textContent  = 'Sair';
+        document.getElementById('login-btn').onclick = () => auth.signOut();
+        localStorage.setItem('fpbr_email_usuario', user.email || '');
+        if (db) {
+          try {
+            const snap = await getDoc(doc(db, 'users', user.uid));
+            if (snap.exists() && snap.data().totalCompras > 0) {
+              document.getElementById('precoVal').textContent = 'R$ 1,50';
+              document.getElementById('precoBtn').textContent = '1,50';
+              document.getElementById('fidelChip').style.display = 'inline-block';
+              localStorage.setItem('fpbr_recorrente', 'true');
+            }
+          } catch(e) { /* Firestore não configurado ainda */ }
+        }
+      } else {
+        document.getElementById('login-nome').textContent = 'Entrar com Google para desconto de fidelidade';
+        document.getElementById('login-btn').textContent  = 'Entrar';
+        document.getElementById('login-btn').onclick = () => window.fazerLogin();
+      }
+    });
+  }
+</script>
+
+<script>
+  //  Estado global 
+  let etapa = 1;
+  const TOTAL = 5;
+  let zm  = 58;
+  let foto64 = '';
+  let habs = [];
+  let expC = 0, formC = 0;
+  let saveTimer = null;
+
+  const SUGE = {
+    'Administrativo':         ['Pacote Office','Excel Avançado','Word','PowerPoint','Organização','Atendimento'],
+    'Atendimento ao Cliente': ['Comunicação','Empatia','Proatividade','CRM','Trabalho em Equipe'],
+    'Comércio e Varejo':      ['Vendas','Negociação','Caixa','Metas','Estoque'],
+    'Saúde':                  ['Enfermagem','BLS','Prontuário Eletrônico','Medicação','Cuidados'],
+    'Tecnologia da Informação':['HTML','CSS','JavaScript','SQL','Git','Linux','Python'],
+    'default':                ['Trabalho em Equipe','Proatividade','Comunicação','Organização','Responsabilidade','Pontualidade']
+  };
+
+  //  Zoom 
+  function z(delta) {
+    zm = Math.max(30, Math.min(100, zm + delta));
+    document.getElementById('cvOuter').style.transform = `scale(${zm/100})`;
+    document.getElementById('zoomVal').textContent = zm + '%';
+  }
+  z(0);
+
+  //  Stepper 
+  function irEtapa(n) {
+    document.getElementById(`etapa-${etapa}`).classList.remove('ativa');
+    const stepAnterior = document.querySelector(`.step-item[data-step="${etapa}"]`);
+    stepAnterior.classList.remove('active');
+    if (n > etapa) stepAnterior.classList.add('done');
+    else stepAnterior.classList.remove('done');
+
+    etapa = n;
+    document.getElementById(`etapa-${etapa}`).classList.add('ativa');
+    document.querySelector(`.step-item[data-step="${etapa}"]`).classList.add('active');
+    document.getElementById('progBar').style.width = `${(etapa / TOTAL) * 100}%`;
+
+    document.getElementById('btnAnt').style.display   = etapa > 1      ? 'block' : 'none';
+    document.getElementById('btnProx').style.display  = etapa < TOTAL  ? 'block' : 'none';
+    document.getElementById('btnPagar').style.display = etapa === TOTAL ? 'block' : 'none';
+
+    if (etapa === 5) renderSugestoes();
+    document.querySelector('.form-col-body').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function etapaProx() {
+    if (etapa === 1) {
+      if (!document.getElementById('f-nome').value.trim()) { mostrarToast(' Preencha seu nome completo.','error'); document.getElementById('f-nome').focus(); return; }
+      if (!document.getElementById('f-cargo').value.trim()){ mostrarToast(' Preencha o cargo desejado.','error');  document.getElementById('f-cargo').focus(); return; }
+    }
+    if (etapa < TOTAL) irEtapa(etapa + 1);
+  }
+  function etapaAnt() { if (etapa > 1) irEtapa(etapa - 1); }
+
+  function irPagar() {
+    if (!document.getElementById('f-nome').value.trim()) { mostrarToast(' Preencha o nome (etapa 1).','error'); irEtapa(1); return; }
+    salvarLocal();
+    window.location.href = 'pagamento.html';
+  }
+
+  //  Foto 
+  function carregarFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      foto64 = e.target.result;
+      const t = document.getElementById('fotoThumb');
+      t.src = foto64; t.style.display = 'block';
+      document.getElementById('fotoIcon').style.display  = 'none';
+      document.getElementById('fotoLabel').textContent   = 'Foto adicionada ';
+      document.getElementById('cv-foto').innerHTML       = `<img src="${foto64}" alt="Foto">`;
+      auto();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  //  Blocos dinâmicos 
+  function addExp(d = {}) {
+    expC++;
+    const id = expC;
+    const el = document.createElement('div');
+    el.className = 'bloco'; el.id = `exp-${id}`;
+    el.innerHTML = `
+      <div class="bloco-num">Experiência ${id}</div>
+      <button class="bloco-del" onclick="del('exp-${id}')"></button>
+      <div class="form-row">
+        <div class="form-group"><label>Cargo</label><input type="text" placeholder="Ex: Vendedor" value="${d.cargo||''}" oninput="auto();prev()"></div>
+        <div class="form-group"><label>Empresa</label><input type="text" placeholder="Ex: Loja ABC" value="${d.empresa||''}" oninput="auto();prev()"></div>
+      </div>
+      <div class="form-group"><label>Período</label><input type="text" placeholder="Jan/2022 – Dez/2023" value="${d.periodo||''}" oninput="auto();prev()"></div>
+      <div class="form-group"><label>Descrição (opcional)</label><textarea rows="2" placeholder="Principais responsabilidades..." oninput="auto();prev()">${d.desc||''}</textarea></div>
+    `;
+    document.getElementById('exp-container').appendChild(el);
+    prev();
+  }
+
+  function addFormacao(d = {}) {
+    formC++;
+    const id = formC;
+    const el = document.createElement('div');
+    el.className = 'bloco'; el.id = `frm-${id}`;
+    el.innerHTML = `
+      <div class="bloco-num">Formação ${id}</div>
+      <button class="bloco-del" onclick="del('frm-${id}')"></button>
+      <div class="form-row">
+        <div class="form-group"><label>Curso / Grau</label><input type="text" placeholder="Ex: Ensino Médio" value="${d.curso||''}" oninput="auto();prev()"></div>
+        <div class="form-group"><label>Instituição</label><input type="text" placeholder="Ex: IFMA" value="${d.inst||''}" oninput="auto();prev()"></div>
+      </div>
+      <div class="form-group"><label>Período</label><input type="text" placeholder="2019 – 2022" value="${d.periodo||''}" oninput="auto();prev()"></div>
+    `;
+    document.getElementById('form-container').appendChild(el);
+    prev();
+  }
+
+  function del(id) { document.getElementById(id)?.remove(); prev(); auto(); }
+
+  //  Habilidades 
+  function addHab(val) {
+    const input = document.getElementById('f-hab-input');
+    const txt = (val || input.value).trim().replace(/,+$/, '');
+    if (!txt || habs.includes(txt)) { input.value = ''; return; }
+    habs.push(txt);
+    if (!val) input.value = '';
+    renderChips();
+    auto(); prev();
+  }
+  function delHab(h) { habs = habs.filter(x => x !== h); renderChips(); auto(); prev(); }
+  function renderChips() {
+    document.getElementById('habs-chips').innerHTML = habs.map(h =>
+      `<div class="hab-chip">${h}<button onclick="delHab('${h.replace(/'/g,"\\'")}')"></button></div>`
+    ).join('');
+  }
+  function renderSugestoes() {
+    const area  = document.getElementById('f-area')?.value || 'default';
+    const lista = SUGE[area] || SUGE['default'];
+    document.getElementById('sugestoes').innerHTML = lista
+      .filter(s => !habs.includes(s))
+      .map(s => `<button class="sug-btn" onclick="addHab('${s.replace(/'/g,"\\'")}');this.remove()">+ ${s}</button>`)
+      .join('');
+  }
+
+  //  Prévia ao vivo 
+  function prev() {
+    const g = id => document.getElementById(id)?.value?.trim() || '';
+    const nome    = g('f-nome');
+    const cargo   = g('f-cargo');
+    const tel     = g('f-tel');
+    const email   = g('f-email');
+    const cidade  = g('f-cidade');
+    const estado  = g('f-estado');
+    const obj     = g('f-objetivo');
+    const idiomas = g('f-idiomas');
+
+    document.getElementById('cv-nome').textContent    = nome  || 'Seu Nome Completo';
+    document.getElementById('cv-cargo').textContent   = cargo || 'Cargo Desejado';
+    document.getElementById('cv-objetivo').textContent = obj  || 'Preencha o formulário ao lado.';
+
+    // Contato
+    const ct = [];
+    if (tel)   ct.push('<i class="ph ph-phone"></i> ' + tel);
+    if (email) ct.push('<i class="ph ph-envelope-simple"></i> ' + email);
+    const loc = [cidade, estado].filter(Boolean).join(' — ');
+    if (loc)   ct.push('<i class="ph ph-map-pin"></i> ' + loc);
+    document.getElementById('cv-contato').innerHTML = ct.map(c =>
+      `<div class="cvp-s-text" style="margin-bottom:4px">${c}</div>`
+    ).join('') || '<div class="cvp-s-text">—</div>';
+
+    // Habilidades
+    const habsEl = document.getElementById('cv-habs');
+    habsEl.innerHTML = habs.length > 0
+      ? habs.map(h => `<div class="cvp-skill-item"><div class="cvp-skill-name">${h}</div><div class="cvp-skill-bg"><div class="cvp-skill-fill"></div></div></div>`).join('')
+      : '<div class="cvp-s-text">—</div>';
+
+    // Idiomas
+    const idSec = document.getElementById('cv-idiomas-sec');
+    if (idiomas) {
+      idSec.style.display = '';
+      document.getElementById('cv-idiomas').innerHTML =
+        idiomas.split(',').map(i => `<div class="cvp-idioma">• ${i.trim()}</div>`).join('');
+    } else { idSec.style.display = 'none'; }
+
+    // Experiências
+    const expEl = document.getElementById('cv-exp');
+    const expBlocos = document.querySelectorAll('[id^="exp-"]');
+    if (!expBlocos.length) {
+      expEl.innerHTML = '<div style="font-size:9px;color:#9CA3AF;font-style:italic">Adicione na etapa 3.</div>';
+    } else {
+      expEl.innerHTML = '';
+      expBlocos.forEach(b => {
+        const ins = b.querySelectorAll('input');
+        const ta  = b.querySelector('textarea');
+        const c_  = ins[0]?.value.trim(), e_ = ins[1]?.value.trim();
+        if (!c_ && !e_) return;
+        expEl.innerHTML += `
+          <div class="cvp-exp-item">
+            <div class="cvp-exp-cargo">${c_||''}</div>
+            <div class="cvp-exp-empresa">${e_||''}</div>
+            ${ins[2]?.value ? `<div class="cvp-exp-periodo">${ins[2].value}</div>` : ''}
+            ${ta?.value    ? `<div class="cvp-exp-desc">${ta.value}</div>`        : ''}
+          </div>`;
+      });
+    }
+
+    // Formação
+    const formEl = document.getElementById('cv-form');
+    const formBlocos = document.querySelectorAll('[id^="frm-"]');
+    if (!formBlocos.length) {
+      formEl.innerHTML = '<div style="font-size:9px;color:#9CA3AF;font-style:italic">Adicione na etapa 4.</div>';
+    } else {
+      formEl.innerHTML = '';
+      formBlocos.forEach(b => {
+        const ins = b.querySelectorAll('input');
+        const c_  = ins[0]?.value.trim();
+        if (!c_) return;
+        formEl.innerHTML += `
+          <div class="cvp-form-item">
+            <div class="cvp-form-curso">${c_}</div>
+            <div class="cvp-form-inst">${ins[1]?.value||''}${ins[2]?.value ? ' · '+ins[2].value : ''}</div>
+          </div>`;
+      });
+    }
+  }
+
+  //  Auto-save 
+  function auto() {
+    document.getElementById('saveDot').className = 'save-dot salvando';
+    document.getElementById('saveTxt').textContent = 'Salvando...';
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      salvarLocal();
+      document.getElementById('saveDot').className = 'save-dot salvo';
+      document.getElementById('saveTxt').textContent = 'Salvo ';
+    }, 800);
+  }
+
+  function salvarLocal() {
+    const dados = coletar();
+    localStorage.setItem('fpbr_dados', JSON.stringify(dados));
+    if (window.salvarFirebase) window.salvarFirebase(dados);
+  }
+
+  function coletar() {
+    const g = id => document.getElementById(id)?.value || '';
+    const exps = [];
+    document.querySelectorAll('[id^="exp-"]').forEach(b => {
+      const ins = b.querySelectorAll('input'), ta = b.querySelector('textarea');
+      exps.push({ cargo: ins[0]?.value||'', empresa: ins[1]?.value||'', periodo: ins[2]?.value||'', desc: ta?.value||'' });
+    });
+    const forms = [];
+    document.querySelectorAll('[id^="frm-"]').forEach(b => {
+      const ins = b.querySelectorAll('input');
+      forms.push({ curso: ins[0]?.value||'', inst: ins[1]?.value||'', periodo: ins[2]?.value||'' });
+    });
+    return {
+      nome: g('f-nome'), cargo: g('f-cargo'), telefone: g('f-tel'),
+      email: g('f-email'), cidade: g('f-cidade'), estado: g('f-estado'),
+      linkedin: g('f-linkedin'), objetivo: g('f-objetivo'),
+      area: g('f-area'), habilidades: habs.join(', '),
+      idiomas: g('f-idiomas'), foto: foto64,
+      experiencias: exps, formacao: forms
+    };
+  }
+
+  //  Restaurar rascunho 
+  function restaurar() {
+    const raw = localStorage.getItem('fpbr_dados');
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw);
+      const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+      set('f-nome', d.nome); set('f-cargo', d.cargo); set('f-tel', d.telefone);
+      set('f-email', d.email); set('f-cidade', d.cidade); set('f-estado', d.estado);
+      set('f-linkedin', d.linkedin); set('f-objetivo', d.objetivo);
+      set('f-area', d.area); set('f-idiomas', d.idiomas);
+
+      if (d.foto) {
+        foto64 = d.foto;
+        document.getElementById('fotoThumb').src = foto64;
+        document.getElementById('fotoThumb').style.display = 'block';
+        document.getElementById('fotoIcon').style.display  = 'none';
+        document.getElementById('fotoLabel').textContent   = 'Foto adicionada ';
+        document.getElementById('cv-foto').innerHTML       = `<img src="${foto64}" alt="Foto">`;
+      }
+      if (d.habilidades) { habs = d.habilidades.split(',').map(h => h.trim()).filter(Boolean); renderChips(); }
+      (d.experiencias||[]).forEach(e => addExp(e));
+      (d.formacao||[]).forEach(f => addFormacao(f));
+      prev();
+      document.getElementById('saveDot').className = 'save-dot salvo';
+      document.getElementById('saveTxt').textContent = 'Salvo ';
+    } catch(e) { console.warn('Restaurar:', e); }
+  }
+
+  //  Toast 
+  function mostrarToast(msg, tipo = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + tipo;
+    void t.offsetWidth; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  //  Init 
+  addExp(); addFormacao();
+  restaurar();
+  if (localStorage.getItem('fpbr_recorrente') === 'true') {
+    document.getElementById('precoVal').textContent = 'R$ 1,50';
+    document.getElementById('precoBtn').textContent = '1,50';
+    document.getElementById('fidelChip').style.display = 'inline-block';
+  }
+</script>
+
+</body>
+</html>

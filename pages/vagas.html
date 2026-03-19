@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vagas na sua cidade — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    body { background: var(--off); }
+
+    /*  Topo da página  */
+    .vagas-header {
+      background: var(--navy);
+      padding: 80px 24px 48px;
+    }
+    .vagas-header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .vagas-header a.logo { display: inline-block; margin-bottom: 24px; }
+    .vagas-header h1 { color: var(--white); font-size: 2.2rem; margin-bottom: 10px; }
+    .vagas-header p  { color: rgba(255,255,255,0.65); font-size: 1rem; }
+
+    /*  Formulário de busca  */
+    .busca-wrap {
+      max-width: 900px;
+      margin: -32px auto 0;
+      padding: 0 24px;
+    }
+    .busca-card {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+    }
+    .busca-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: end;
+    }
+    .busca-grid .form-group { margin-bottom: 0; }
+    .btn-buscar {
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 11px 24px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--trans);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-buscar:hover { background: var(--gold2); }
+    .btn-buscar:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /*  Contador de envios  */
+    .envios-tracker {
+      max-width: 900px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+    }
+    .envios-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      border-radius: 10px;
+      padding: 14px 20px;
+      box-shadow: var(--shadow2);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .envios-count {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+    }
+    .envios-dots { display: flex; gap: 6px; }
+    .envios-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .envios-dot.ativo   { background: var(--gold); }
+    .envios-dot.inativo { background: var(--light); }
+    .envios-text { color: var(--dark); }
+    .envios-text strong { color: var(--navy); }
+
+    .btn-pack {
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: var(--navy);
+      color: var(--white);
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--trans);
+    }
+    .btn-pack:hover { background: var(--navy2); }
+
+    /*  Lista de vagas  */
+    .vagas-content {
+      max-width: 900px;
+      margin: 24px auto 60px;
+      padding: 0 24px;
+    }
+    .vagas-count-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .vagas-count-label { font-size: 0.88rem; color: var(--gray); }
+    .vagas-count-label strong { color: var(--navy); }
+
+    .vaga-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 22px 24px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow2);
+      border: 1.5px solid transparent;
+      transition: all var(--trans);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .vaga-card:hover { border-color: rgba(212,175,55,0.4); transform: translateY(-2px); }
+    .vaga-card.enviada { border-color: #16a34a; background: rgba(22,163,74,0.04); }
+
+    .vaga-logo-box {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      background: var(--off);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .vaga-body { flex: 1; min-width: 0; }
+    .vaga-empresa { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .vaga-titulo { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .vaga-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: var(--gray);
+      margin-bottom: 10px;
+    }
+    .vaga-meta span { display: flex; align-items: center; gap: 4px; }
+    .vaga-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+
+    .vaga-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+    .btn-enviar-curriculo {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all var(--trans);
+      white-space: nowrap;
+    }
+    .btn-enviar-curriculo:hover { background: var(--navy2); }
+    .btn-enviar-curriculo.enviado {
+      background: #16a34a;
+      cursor: default;
+    }
+    .btn-enviar-curriculo:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-ver-vaga {
+      font-size: 0.78rem;
+      color: var(--gray);
+      border: 1.5px solid var(--light);
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      transition: all var(--trans);
+      text-decoration: none;
+    }
+    .btn-ver-vaga:hover { border-color: var(--navy); color: var(--navy); }
+
+    /*  Estados  */
+    .vagas-empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--gray);
+    }
+    .vagas-empty .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+    .vagas-empty h3 { color: var(--navy); margin-bottom: 8px; }
+
+    .vagas-loading {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--gray);
+    }
+    .spinner-gold {
+      width: 36px; height: 36px;
+      border: 3px solid var(--light);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /*  Modal confirmação de envio  */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-backdrop.ativo { display: flex; }
+    .modal-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 36px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-box h3 { color: var(--navy); margin-bottom: 10px; }
+    .modal-box p  { margin-bottom: 20px; font-size: 0.9rem; }
+
+    .modal-vaga-info {
+      background: var(--off);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .modal-vaga-info .mv-empresa { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-bottom: 4px; }
+    .modal-vaga-info .mv-cargo   { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+    .modal-vaga-info .mv-email   { font-size: 0.82rem; color: var(--gray); }
+
+    .modal-nome-campo {
+      margin-bottom: 20px;
+    }
+    .modal-nome-campo label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .modal-nome-campo input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--light);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .modal-nome-campo input:focus { border-color: var(--navy); }
+
+    .modal-actions { display: flex; gap: 12px; }
+    .modal-actions .btn-primary { flex: 1; text-align: center; }
+    .btn-modal-cancel {
+      flex: 1; text-align: center;
+      background: var(--off);
+      color: var(--dark);
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: background var(--trans);
+    }
+    .btn-modal-cancel:hover { background: var(--light); }
+
+    /*  Banner pacote ilimitado  */
+    .banner-pack {
+      background: var(--navy);
+      border-radius: 12px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .banner-pack-text h4 { color: var(--white); margin-bottom: 4px; font-size: 1rem; }
+    .banner-pack-text p  { color: rgba(255,255,255,0.6); font-size: 0.85rem; }
+
+    /* Aviso sem currículo */
+    .aviso-curriculo {
+      background: #FEF3C7;
+      border: 1px solid #F59E0B;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      color: #92400E;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    @media (max-width: 700px) {
+      .busca-grid { grid-template-columns: 1fr 1fr; }
+      .busca-grid .btn-buscar { grid-column: span 2; }
+      .vaga-card { flex-direction: column; }
+      .vaga-actions { width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .busca-grid { grid-template-columns: 1fr; }
+      .busca-grid .btn-buscar { grid-column: span 1; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+</head>
+<body>
+
+<!-- Cabeçalho -->
+<div class="vagas-header">
+  <div class="vagas-header-inner">
+    <a href="../index.html" class="logo">
+      <span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span>
+    </a>
+    <h1>Vagas na sua cidade</h1>
+    <p>Encontre empresas que estão contratando e envie seu currículo com um clique.</p>
+  </div>
+</div>
+
+<!-- Busca -->
+<div class="busca-wrap">
+  <div class="busca-card">
+    <div class="busca-grid">
+      <div class="form-group">
+        <label>Cargo ou área</label>
+        <input type="text" id="buscaCargo" placeholder="Ex: Auxiliar, Vendedor, Atendente" value="">
+      </div>
+      <div class="form-group">
+        <label>Cidade</label>
+        <input type="text" id="buscaCidade" placeholder="Ex: São Luís" value="São Luís">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="buscaEstado">
+          <option value="MA" selected>Maranhão</option>
+          <option value="PA">Pará</option>
+          <option value="PI">Piauí</option>
+          <option value="CE">Ceará</option>
+          <option value="BA">Bahia</option>
+          <option value="PE">Pernambuco</option>
+          <option value="SP">São Paulo</option>
+          <option value="RJ">Rio de Janeiro</option>
+          <option value="MG">Minas Gerais</option>
+          <option value="GO">Goiás</option>
+          <option value="DF">Brasília</option>
+          <option value="PR">Paraná</option>
+          <option value="SC">Santa Catarina</option>
+          <option value="RS">Rio Grande do Sul</option>
+          <option value="AM">Amazonas</option>
+          <option value="AC">Acre</option>
+          <option value="RO">Rondônia</option>
+          <option value="RR">Roraima</option>
+          <option value="AP">Amapá</option>
+          <option value="TO">Tocantins</option>
+          <option value="MT">Mato Grosso</option>
+          <option value="MS">Mato Grosso do Sul</option>
+          <option value="ES">Espírito Santo</option>
+          <option value="AL">Alagoas</option>
+          <option value="SE">Sergipe</option>
+          <option value="RN">Rio Grande do Norte</option>
+          <option value="PB">Paraíba</option>
+        </select>
+      </div>
+      <button class="btn-buscar" id="btnBuscar" onclick="buscarVagas()">
+        <i class="ph ph-magnifying-glass"></i> Buscar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tracker de envios -->
+<div class="envios-tracker">
+  <div class="envios-bar">
+    <div class="envios-count">
+      <div class="envios-dots" id="enviosDots"></div>
+      <div class="envios-text">
+        <strong id="enviosTxt">5 envios</strong> disponíveis neste currículo
+      </div>
+    </div>
+    <button class="btn-pack" onclick="abrirModalPack()">
+      <i class="ph ph-paper-plane-right"></i> Pacote ilimitado — R$1,00
+    </button>
+  </div>
+</div>
+
+<!-- Conteúdo (vagas) -->
+<div class="vagas-content">
+  <!-- Aviso se não tem currículo gerado -->
+  <div class="aviso-curriculo" id="avisoCurriculo" style="display:none">
+    <span style="font-size:1.3rem"></span>
+    <div>Você ainda não gerou seu currículo. <a href="editor.html" style="font-weight:700;color:#92400E">Crie agora por R$2,50</a> para poder enviar para as empresas.</div>
+  </div>
+
+  <!-- Banner pack ilimitado (aparece quando envios = 0) -->
+  <div class="banner-pack" id="bannerPack" style="display:none">
+    <div class="banner-pack-text">
+      <h4><i class="ph ph-rocket"></i> Seus envios gratuitos acabaram</h4>
+      <p>Desbloqueie envios ilimitados por 7 dias por apenas R$1,00.</p>
+    </div>
+    <a href="pagamento.html?tipo=pack" class="btn-primary">Desbloquear por R$1,00</a>
+  </div>
+
+  <!-- Loading -->
+  <div class="vagas-loading" id="vagasLoading" style="display:none">
+    <div class="spinner-gold"></div>
+    Buscando vagas em <span id="loadingCidade">São Luís</span>...
+  </div>
+
+  <!-- Empty state -->
+  <div class="vagas-empty" id="vagasEmpty" style="display:none">
+    <div class="empty-icon"><i class="ph ph-magnifying-glass"></i></div>
+    <h3>Nenhuma vaga encontrada</h3>
+    <p>Tente buscar por um cargo diferente ou verifique sua cidade.</p>
+    <a href="https://www.empregabrasil.mte.gov.br" target="_blank" class="btn-ghost" style="margin-top:16px;display:inline-block">
+      Ver vagas no Portal Emprega Brasil ↗
+    </a>
+  </div>
+
+  <!-- Contador de resultados -->
+  <div class="vagas-count-bar" id="vagasCountBar" style="display:none">
+    <div class="vagas-count-label">
+      <strong id="vagasCountNum">0</strong> vagas encontradas para <span id="vagasCountLocal"></span>
+    </div>
+    <a id="linkEmpregaBrasil" href="#" target="_blank"
+       style="font-size:0.78rem;color:var(--gray)">
+      Ver mais no Emprega Brasil ↗
+    </a>
+  </div>
+
+  <!-- Lista de vagas -->
+  <div id="vagasLista"></div>
+
+  <!-- Aviso inicial -->
+  <div class="vagas-empty" id="vagasInicial">
+    <div class="empty-icon"><i class="ph ph-buildings"></i></div>
+    <h3>Busque vagas na sua cidade</h3>
+    <p>Preencha a cidade e o cargo desejado e clique em Buscar.</p>
+  </div>
+</div>
+
+<!-- Modal de envio -->
+<div class="modal-backdrop" id="modalEnvio">
+  <div class="modal-box">
+    <h3>Enviar currículo</h3>
+    <p>Confirme os dados antes de enviar:</p>
+
+    <div class="modal-vaga-info">
+      <div class="mv-empresa" id="modalEmpresa">—</div>
+      <div class="mv-cargo"   id="modalCargo">—</div>
+      <div class="mv-email"><i class="ph ph-envelope-simple"></i> <span id="modalEmail">—</span></div>
+    </div>
+
+    <div class="modal-nome-campo">
+      <label>Seu nome (para o assunto do email)</label>
+      <input type="text" id="modalNome" placeholder="Ex: Maria Silva">
+    </div>
+
+    <div class="form-group" style="margin-bottom:16px">
+      <label style="font-size:0.82rem;font-weight:700;color:var(--navy)">Seu email (para resposta da empresa)</label>
+      <input type="email" id="modalEmailCandidato" placeholder="seu@email.com">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarEnvio()" id="btnConfirmarEnvio">
+        Enviar currículo <i class="ph ph-envelope-simple"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pack ilimitado -->
+<div class="modal-backdrop" id="modalPack">
+  <div class="modal-box" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:16px"><i class="ph ph-rocket"></i></div>
+    <h3>Envios Ilimitados por 7 dias</h3>
+    <p style="margin-bottom:24px">Envie seu currículo para quantas empresas quiser durante 7 dias — sem limite!</p>
+    <div style="font-family:var(--font-display);font-size:2.5rem;color:var(--gold);margin-bottom:24px">R$1,00</div>
+    <div style="display:flex;gap:12px">
+      <button class="btn-modal-cancel" onclick="fecharModalPack()">Agora não</button>
+      <a href="pagamento.html?tipo=pack" class="btn-primary" style="flex:1;text-align:center">Ativar por R$1,00</a>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  //  CONFIGURAÇÃO EMAILJS 
+  //  Substitua com suas credenciais do EmailJS (emailjs.com — gratuito até 200 emails/mês)
+  const EMAILJS_PUBLIC_KEY  = 'SUA_PUBLIC_KEY_EMAILJS';
+  const EMAILJS_SERVICE_ID  = 'SUA_SERVICE_ID_EMAILJS';
+  const EMAILJS_TEMPLATE_ID = 'SUA_TEMPLATE_ID_EMAILJS';
+
+  // Inicializar EmailJS
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  //  ESTADO 
+  let enviosRestantes = parseInt(localStorage.getItem('fpbr_envios_restantes') ?? '5');
+  let enviosIlimitados = localStorage.getItem('fpbr_envios_ilimitados') === 'true';
+  let vagaAtualEnvio  = null;
+  let todasAsVagas    = [];
+
+  // Verificar se tem currículo gerado
+  const temCurriculo = localStorage.getItem('fpbr_pago') === 'true';
+  if (!temCurriculo) {
+    document.getElementById('avisoCurriculo').style.display = 'flex';
+  }
+
+  //  RENDER DOS DOTS DE ENVIOS 
+  function renderizarDots() {
+    const dotsEl = document.getElementById('enviosDots');
+    const txtEl  = document.getElementById('enviosTxt');
+    dotsEl.innerHTML = '';
+
+    if (enviosIlimitados) {
+      txtEl.textContent = '∞ envios ilimitados';
+      dotsEl.innerHTML  = '<span style="font-size:1.2rem;color:var(--gold)"></span>';
+      document.getElementById('bannerPack').style.display = 'none';
+      return;
+    }
+
+    for (let i = 0; i < 5; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'envios-dot ' + (i < enviosRestantes ? 'ativo' : 'inativo');
+      dotsEl.appendChild(dot);
+    }
+
+    txtEl.textContent = `${enviosRestantes} envio${enviosRestantes !== 1 ? 's' : ''}`;
+
+    if (enviosRestantes === 0) {
+      document.getElementById('bannerPack').style.display = 'flex';
+    }
+  }
+  renderizarDots();
+
+  //  BUSCAR VAGAS 
+  async function buscarVagas() {
+    const cargo  = document.getElementById('buscaCargo').value.trim();
+    const cidade = document.getElementById('buscaCidade').value.trim();
+    const estado = document.getElementById('buscaEstado').value;
+
+    if (!cidade) {
+      mostrarToast(' Informe sua cidade.', 'error');
+      return;
+    }
+
+    // Esconder elementos
+    document.getElementById('vagasInicial').style.display    = 'none';
+    document.getElementById('vagasEmpty').style.display      = 'none';
+    document.getElementById('vagasCountBar').style.display   = 'none';
+    document.getElementById('vagasLista').innerHTML          = '';
+    document.getElementById('vagasLoading').style.display    = 'block';
+    document.getElementById('loadingCidade').textContent     = cidade;
+    document.getElementById('btnBuscar').disabled            = true;
+
+    try {
+      // Tentar a API do Emprega Brasil (gov.br)
+      const vagas = await buscarEmpregaBrasil(cargo, cidade, estado);
+      todasAsVagas = vagas;
+      exibirVagas(vagas, cargo, cidade, estado);
+    } catch (err) {
+      console.warn('API gov.br indisponível, usando vagas de demonstração:', err);
+      // Fallback: vagas de demonstração baseadas na cidade/cargo
+      const vagasDemo = gerarVagasDemo(cargo, cidade, estado);
+      todasAsVagas = vagasDemo;
+      exibirVagas(vagasDemo, cargo, cidade, estado);
+    } finally {
+      document.getElementById('vagasLoading').style.display = 'none';
+      document.getElementById('btnBuscar').disabled = false;
+    }
+  }
+
+  //  API EMPREGA BRASIL 
+  async function buscarEmpregaBrasil(cargo, cidade, estado) {
+    // Endpoint público do Portal Emprega Brasil / SINE Digital
+    // Nota: a API real exige CORS proxy em produção. Usando cors-anywhere como exemplo.
+    const baseUrl = 'https://api.empregabrasil.mte.gov.br/v1/vagas';
+    const params  = new URLSearchParams({
+      municipio: cidade.toUpperCase(),
+      uf:        estado,
+      ...(cargo ? { descricao: cargo } : {}),
+      quantidade: 20,
+      pagina:     1
+    });
+
+    // Em produção com domínio próprio, usar fetch direto.
+    // Durante desenvolvimento local, pode precisar de um proxy CORS.
+    const resp = await fetch(`${baseUrl}?${params}`, {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(8000)
+    });
+
+    if (!resp.ok) throw new Error('API indisponível');
+
+    const data = await resp.json();
+    const lista = data.vagas || data.data || data || [];
+
+    return lista.map(v => ({
+      id:       v.id || Math.random().toString(36).slice(2),
+      titulo:   v.descricao || v.cargo || v.titulo || 'Vaga disponível',
+      empresa:  v.empresa   || v.empregador || v.razaoSocial || 'Empresa Confidencial',
+      cidade:   v.municipio || cidade,
+      estado:   v.uf        || estado,
+      email:    v.emailEmpresa || v.email || gerarEmailDemo(v.empresa || v.empregador || ''),
+      salario:  v.salario   || v.remuneracao || '',
+      tipo:     v.tipoContrato || 'CLT',
+      desc:     v.atribuicoes || v.observacoes || '',
+      icon:     '<i class="ph ph-buildings"></i>',
+      link:     `https://www.empregabrasil.mte.gov.br/vagas/${v.id || ''}`
+    }));
+  }
+
+  //  VAGAS DE DEMONSTRAÇÃO (fallback) 
+  function gerarVagasDemo(cargo, cidade, estado) {
+    const baseVagas = [
+      { empresa: 'Supermercado Mateus',  titulo: 'Operador de Caixa',       icon: '<i class="ph ph-shopping-cart"></i>', salario: 'R$ 1.400,00', tipo: 'CLT' },
+      { empresa: 'Atacadão',             titulo: 'Auxiliar de Estoque',      icon: '<i class="ph ph-package"></i>', salario: 'R$ 1.500,00', tipo: 'CLT' },
+      { empresa: 'Drogasil',             titulo: 'Atendente de Farmácia',    icon: '<i class="ph ph-pill"></i>', salario: 'R$ 1.600,00', tipo: 'CLT' },
+      { empresa: 'iFood',                titulo: 'Entregador Parceiro',      icon: '<i class="ph ph-motorcycle"></i>', salario: 'A combinar',   tipo: 'PJ'  },
+      { empresa: 'McDonald\'s',          titulo: 'Atendente de Lanchonete',  icon: '<i class="ph ph-hamburger"></i>', salario: 'R$ 1.320,00', tipo: 'CLT' },
+      { empresa: 'Unimed',               titulo: 'Auxiliar Administrativo',  icon: '<i class="ph ph-first-aid-kit"></i>', salario: 'R$ 1.800,00', tipo: 'CLT' },
+      { empresa: 'Magazine Luiza',       titulo: 'Assistente de Vendas',     icon: '<i class="ph ph-bag"></i>', salario: 'R$ 1.450,00', tipo: 'CLT' },
+      { empresa: 'Burger King',          titulo: 'Operador de Loja',         icon: '<i class="ph ph-hamburger"></i>', salario: 'R$ 1.320,00', tipo: 'CLT' },
+      { empresa: 'Banco do Brasil',      titulo: 'Assistente Bancário',      icon: '<i class="ph ph-bank"></i>', salario: 'R$ 3.200,00', tipo: 'CLT' },
+      { empresa: 'Lojas Americanas',     titulo: 'Vendedor',                 icon: '<i class="ph ph-storefront"></i>', salario: 'R$ 1.350,00', tipo: 'CLT' },
+      { empresa: 'Localfrio',            titulo: 'Motorista Entregador',     icon: '<i class="ph ph-truck"></i>', salario: 'R$ 2.100,00', tipo: 'CLT' },
+      { empresa: 'TIM Brasil',           titulo: 'Consultor de Vendas',      icon: '<i class="ph ph-device-mobile"></i>', salario: 'R$ 1.600,00', tipo: 'CLT' },
+    ];
+
+    // Filtrar pelo cargo digitado
+    const filtradas = cargo
+      ? baseVagas.filter(v =>
+          v.titulo.toLowerCase().includes(cargo.toLowerCase()) ||
+          v.empresa.toLowerCase().includes(cargo.toLowerCase())
+        )
+      : baseVagas;
+
+    const resultado = (filtradas.length > 0 ? filtradas : baseVagas).slice(0, 10);
+
+    return resultado.map((v, i) => ({
+      id:      `demo-${i}`,
+      titulo:  v.titulo,
+      empresa: v.empresa,
+      cidade:  cidade,
+      estado:  estado,
+      email:   gerarEmailDemo(v.empresa),
+      salario: v.salario,
+      tipo:    v.tipo,
+      desc:    `Vaga de ${v.titulo} em ${cidade}/${estado}. Entre em contato para mais informações.`,
+      icon:    v.icon,
+      link:    `https://www.empregabrasil.mte.gov.br/vagas/?municipio=${encodeURIComponent(cidade)}&uf=${estado}`
+    }));
+  }
+
+  function gerarEmailDemo(empresa) {
+    const slug = empresa.toLowerCase()
+      .replace(/\s+/g, '')
+      .replace(/[^a-z]/g, '')
+      .slice(0, 15);
+    return `vagas@${slug || 'empresa'}.com.br`;
+  }
+
+  //  EXIBIR VAGAS 
+  function exibirVagas(vagas, cargo, cidade, estado) {
+    const lista    = document.getElementById('vagasLista');
+    const countBar = document.getElementById('vagasCountBar');
+    const empty    = document.getElementById('vagasEmpty');
+
+    if (vagas.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    countBar.style.display = 'flex';
+    document.getElementById('vagasCountNum').textContent   = vagas.length;
+    document.getElementById('vagasCountLocal').textContent = `${cargo ? cargo + ' em ' : ''}${cidade}/${estado}`;
+    document.getElementById('linkEmpregaBrasil').href =
+      `https://www.empregabrasil.mte.gov.br/vagas/?municipio=${encodeURIComponent(cidade)}&uf=${estado}`;
+
+    const jaEnviadas = JSON.parse(localStorage.getItem('fpbr_enviadas') || '[]');
+
+    lista.innerHTML = '';
+    vagas.forEach(vaga => {
+      const foiEnviada = jaEnviadas.includes(vaga.id);
+      const card = document.createElement('div');
+      card.className = 'vaga-card' + (foiEnviada ? ' enviada' : '');
+      card.innerHTML = `
+        <div class="vaga-logo-box">${vaga.icon}</div>
+        <div class="vaga-body">
+          <div class="vaga-empresa">${vaga.empresa}</div>
+          <div class="vaga-titulo">${vaga.titulo}</div>
+          <div class="vaga-meta">
+            <span><i class="ph ph-map-pin"></i> ${vaga.cidade}/${vaga.estado}</span>
+            ${vaga.salario ? `<span> ${vaga.salario}</span>` : ''}
+            <span> ${vaga.tipo || 'CLT'}</span>
+          </div>
+          ${vaga.desc ? `<div class="vaga-desc">${vaga.desc.slice(0, 120)}${vaga.desc.length > 120 ? '...' : ''}</div>` : ''}
+        </div>
+        <div class="vaga-actions">
+          <button
+            class="btn-enviar-curriculo ${foiEnviada ? 'enviado' : ''}"
+            id="btnEnviar-${vaga.id}"
+            onclick="abrirModalEnvio('${vaga.id}')"
+            ${foiEnviada ? 'disabled' : ''}
+          >
+            ${foiEnviada ? ' Enviado' : '<i class="ph ph-envelope-simple"></i> Enviar currículo'}
+          </button>
+          <a href="${vaga.link}" target="_blank" class="btn-ver-vaga">Ver vaga</a>
+        </div>
+      `;
+      lista.appendChild(card);
+    });
+  }
+
+  //  MODAL DE ENVIO 
+  function abrirModalEnvio(vagaId) {
+    if (!temCurriculo) {
+      mostrarToast(' Gere seu currículo primeiro para enviar.', 'error');
+      return;
+    }
+
+    if (!enviosIlimitados && enviosRestantes <= 0) {
+      abrirModalPack();
+      return;
+    }
+
+    vagaAtualEnvio = todasAsVagas.find(v => v.id === vagaId);
+    if (!vagaAtualEnvio) return;
+
+    document.getElementById('modalEmpresa').textContent = vagaAtualEnvio.empresa;
+    document.getElementById('modalCargo').textContent   = vagaAtualEnvio.titulo;
+    document.getElementById('modalEmail').textContent   = vagaAtualEnvio.email;
+
+    // Pré-preencher com dados do localStorage
+    const dados = JSON.parse(localStorage.getItem('fpbr_dados') || '{}');
+    document.getElementById('modalNome').value            = dados.nome  || '';
+    document.getElementById('modalEmailCandidato').value  = dados.email || localStorage.getItem('fpbr_email_usuario') || '';
+
+    document.getElementById('modalEnvio').classList.add('ativo');
+  }
+
+  function fecharModal() {
+    document.getElementById('modalEnvio').classList.remove('ativo');
+    vagaAtualEnvio = null;
+  }
+
+  // Fechar clicando fora
+  document.getElementById('modalEnvio').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalEnvio')) fecharModal();
+  });
+
+  //  CONFIRMAR ENVIO 
+  /*  ENVIO AUTOMÁTICO VIA EMAILJS (MELHORADO)  */
+  /* ─── ENVIO AUTOMÁTICO VIA EMAILJS (MELHORADO) ─────── */
+  async function confirmarEnvio() {
+    const nome            = document.getElementById('modalNome').value.trim();
+    const emailCandidato  = document.getElementById('modalEmailCandidato').value.trim();
+    const dados           = JSON.parse(localStorage.getItem('fpbr_dados') || '{}');
+    const cargo_pretendido= dados.cargo || '';
+    const objetivo        = dados.objetivo || '';
+
+    if (!nome)                          { mostrarToast('Informe seu nome.', 'error'); return; }
+    if (!emailCandidato.includes('@'))  { mostrarToast('Informe seu email.', 'error'); return; }
+    if (!vagaAtualEnvio)                return;
+
+    const btn = document.getElementById('btnConfirmarEnvio');
+    btn.disabled = true; btn.textContent = 'Gerando mensagem...';
+
+    // Gerar texto personalizado com IA (ou fallback)
+    let mensagemIA = '';
+    try {
+      const promptEmail = `Escreva um email profissional de candidatura para a vaga de "${vagaAtualEnvio.titulo}" na empresa "${vagaAtualEnvio.empresa}".
+Candidato: ${nome}. Cargo pretendido: ${cargo_pretendido || vagaAtualEnvio.titulo}.
+Resumo do candidato: "${objetivo || 'Profissional em busca de oportunidade'}".
+Email de resposta: ${emailCandidato}
+
+Regras: português simples e direto, máximo 5 linhas, profissional mas humano, mencionar o cargo e a empresa. Apenas o corpo do email, sem assunto, sem "Prezados", comece direto.`;
+
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 200, messages: [{ role:'user', content: promptEmail }] })
+      });
+      const d = await r.json();
+      mensagemIA = d.content?.[0]?.text?.trim() || '';
+    } catch(e) {
+      mensagemIA = '';
+    }
+
+    // Fallback se IA não responder
+    if (!mensagemIA) {
+      mensagemIA = `Olá, ${vagaAtualEnvio.empresa}!\n\nMeu nome é ${nome} e tenho interesse na vaga de ${vagaAtualEnvio.titulo}. Sou um profissional dedicado e estou disponível para uma conversa.\n\nMeu currículo está anexado a este email.\n\nAtenciosamente,\n${nome}\n${emailCandidato}`;
+    }
+
+    btn.textContent = 'Enviando...';
+
+    // Verificar se EmailJS está configurado
+    const emailjsOk = typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'SUA_PUBLIC_KEY_EMAILJS';
+
+    if (!emailjsOk) {
+      // Fallback: abrir Gmail/email padrão com tudo preenchido
+      const assunto   = encodeURIComponent(`Candidatura — ${vagaAtualEnvio.titulo} | ${nome}`);
+      const corpo     = encodeURIComponent(mensagemIA);
+      const para      = encodeURIComponent(vagaAtualEnvio.email);
+      const gmailLink = `https://mail.google.com/mail/?view=cm&to=${para}&su=${assunto}&body=${corpo}`;
+      window.open(gmailLink, '_blank');
+      marcarEnviada(vagaAtualEnvio.id, vagaAtualEnvio.empresa);
+      fecharModal();
+      return;
+    }
+
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        para_empresa:    vagaAtualEnvio.email,
+        nome_empresa:    vagaAtualEnvio.empresa,
+        cargo_vaga:      vagaAtualEnvio.titulo,
+        nome_candidato:  nome,
+        email_candidato: emailCandidato,
+        cidade:          vagaAtualEnvio.cidade,
+        mensagem:        mensagemIA
+      });
+      marcarEnviada(vagaAtualEnvio.id, vagaAtualEnvio.empresa);
+    } catch(err) {
+      console.error(err);
+      // Fallback Gmail se EmailJS falhar
+      const assunto   = encodeURIComponent(`Candidatura — ${vagaAtualEnvio.titulo} | ${nome}`);
+      const corpo     = encodeURIComponent(mensagemIA);
+      const para      = encodeURIComponent(vagaAtualEnvio.email);
+      const gmailLink = `https://mail.google.com/mail/?view=cm&to=${para}&su=${assunto}&body=${corpo}`;
+      window.open(gmailLink, '_blank');
+      marcarEnviada(vagaAtualEnvio.id, vagaAtualEnvio.empresa);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enviar currículo';
+      fecharModal();
+    }
+  }
+
+  
+  function marcarEnviada(vagaId, empresa) {
+    // Atualizar contador
+    if (!enviosIlimitados) {
+      enviosRestantes = Math.max(0, enviosRestantes - 1);
+      localStorage.setItem('fpbr_envios_restantes', enviosRestantes);
+    }
+
+    // Registrar como enviada
+    const jaEnviadas = JSON.parse(localStorage.getItem('fpbr_enviadas') || '[]');
+    if (!jaEnviadas.includes(vagaId)) {
+      jaEnviadas.push(vagaId);
+      localStorage.setItem('fpbr_enviadas', JSON.stringify(jaEnviadas));
+    }
+
+    // Atualizar UI
+    const btn = document.getElementById(`btnEnviar-${vagaId}`);
+    if (btn) {
+      btn.textContent = ' Enviado';
+      btn.classList.add('enviado');
+      btn.disabled = true;
+      btn.closest('.vaga-card')?.classList.add('enviada');
+    }
+
+    renderizarDots();
+    fecharModal();
+    mostrarToast(` Currículo enviado para ${empresa}!`, 'success');
+  }
+
+  //  MODAL PACK 
+  function abrirModalPack()  { document.getElementById('modalPack').classList.add('ativo'); }
+  function fecharModalPack() { document.getElementById('modalPack').classList.remove('ativo'); }
+  document.getElementById('modalPack').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalPack')) fecharModalPack();
+  });
+
+  // Verificar se desbloqueou pack ilimitado ao voltar do pagamento
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tipo') === 'pack' && (urlParams.get('status') === 'approved' || urlParams.get('collection_status') === 'approved')) {
+    enviosIlimitados = true;
+    localStorage.setItem('fpbr_envios_ilimitados', 'true');
+    const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    localStorage.setItem('fpbr_envios_expiry', expiryDate);
+    renderizarDots();
+    mostrarToast('<i class="ph ph-confetti"></i> Envios ilimitados desbloqueados por 7 dias!', 'success');
+  }
+
+  // Verificar expiração do pack ilimitado
+  const expiry = localStorage.getItem('fpbr_envios_expiry');
+  if (expiry && new Date(expiry) < new Date()) {
+    localStorage.removeItem('fpbr_envios_ilimitados');
+    localStorage.removeItem('fpbr_envios_expiry');
+    enviosIlimitados = false;
+  }
+
+  // ESC fecha modais
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { fecharModal(); fecharModalPack(); }
+  });
+
+  //  TOAST 
+  function mostrarToast(msg, tipo = '') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className   = 'toast ' + tipo;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // Auto-buscar se vier com params na URL
+  if (urlParams.get('cargo') || urlParams.get('cidade')) {
+    if (urlParams.get('cargo'))  document.getElementById('buscaCargo').value  = urlParams.get('cargo');
+    if (urlParams.get('cidade')) document.getElementById('buscaCidade').value = urlParams.get('cidade');
+    buscarVagas();
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormaPrint BR — Currículo Profissional por R$2,50</title>
+  <meta name="description" content="Crie um currículo profissional em minutos, envie para empresas e ganhe currículos grátis indicando amigos. Só R$2,50.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /*  Avaliações  */
+    .avaliacoes { background: var(--off); }
+    .aval-grid  { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .aval-card  {
+      background: var(--white); border-radius: var(--r);
+      padding: 22px 20px; box-shadow: var(--shadow2);
+      border: 1.5px solid transparent; transition: transform var(--t), box-shadow var(--t);
+    }
+    .aval-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .aval-card.destaque { border-color: var(--gold); }
+    .aval-stars  { color: var(--gold); letter-spacing: 2px; font-size: .95rem; margin-bottom: 10px; }
+    .aval-texto  { font-size: .88rem; color: var(--dark); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+    .aval-autor  { display: flex; align-items: center; gap: 10px; }
+    .aval-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--white); font-weight: 700; font-size: .95rem; flex-shrink: 0;
+    }
+    .aval-nome   { font-size: .85rem; font-weight: 700; color: var(--navy); }
+    .aval-cargo  { font-size: .72rem; color: var(--gray); }
+    .aval-media  {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--navy); border-radius: var(--r);
+      padding: 20px 28px; margin-bottom: 40px;
+    }
+    .aval-media-num { font-family: var(--display); font-size: 3rem; color: var(--gold); font-weight: 900; line-height: 1; }
+    .aval-media-info { flex: 1; }
+    .aval-media-stars { color: var(--gold); font-size: 1.1rem; letter-spacing: 3px; margin-bottom: 4px; }
+    .aval-media-txt { font-size: .82rem; color: rgba(255,255,255,.55); }
+    .btn-aval {
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 2px solid var(--gold); color: var(--gold);
+      font-weight: 700; font-size: .85rem; padding: 10px 22px;
+      border-radius: 8px; transition: all var(--t);
+    }
+    .btn-aval:hover { background: var(--gold); color: var(--navy); }
+
+    /*  Indicação  */
+    .indicacao-section { background: var(--navy); position: relative; overflow: hidden; }
+    .indicacao-section::before {
+      content: ''; position: absolute; left: -80px; bottom: -80px;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(212,175,55,.09), transparent 70%);
+      border-radius: 50%;
+    }
+    .ind-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .ind-text h2 { color: var(--white); margin-bottom: 14px; }
+    .ind-text p  { color: rgba(255,255,255,.6); margin-bottom: 28px; }
+    .ind-steps   { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+    .ind-step    { display: flex; align-items: flex-start; gap: 14px; }
+    .ind-step-n  {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--gold); color: var(--navy);
+      font-weight: 700; font-size: .8rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .ind-step-txt strong { display: block; color: var(--white); font-size: .88rem; margin-bottom: 2px; }
+    .ind-step-txt span   { color: rgba(255,255,255,.5); font-size: .78rem; }
+    .ind-card {
+      background: var(--white); border-radius: 16px;
+      padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .ind-card h3 { color: var(--navy); margin-bottom: 6px; font-size: 1.1rem; }
+    .ind-card p  { font-size: .82rem; margin-bottom: 20px; }
+    .ind-link-box {
+      background: var(--off); border-radius: 8px;
+      padding: 12px 14px; font-size: .82rem;
+      color: var(--gray); font-family: monospace;
+      margin-bottom: 14px; word-break: break-all;
+      border: 1.5px solid var(--light);
+    }
+    .ind-share-btns { display: flex; gap: 8px; }
+    .btn-whats {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+      background: #25D366; color: var(--white); font-weight: 700;
+      padding: 11px; border-radius: 8px; font-size: .85rem;
+      transition: background var(--t);
+    }
+    .btn-whats:hover { background: #1aaa52; }
+    .btn-copy {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--off); border: 1.5px solid var(--light);
+      color: var(--navy); font-weight: 700; padding: 11px 16px;
+      border-radius: 8px; font-size: .85rem; cursor: pointer;
+      transition: background var(--t); font-family: var(--body);
+    }
+    .btn-copy:hover { background: var(--light); }
+
+    /*  Verificador grátis  */
+    .verificador-section { background: var(--white); }
+    .verif-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .verif-text h2 { color: var(--navy); margin-bottom: 12px; }
+    .verif-text p  { margin-bottom: 28px; }
+    .verif-features { margin-bottom: 32px; }
+    .verif-feat {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .9rem; color: var(--dark); margin-bottom: 12px;
+    }
+    .verif-feat i { color: var(--gold); font-size: 1rem; }
+    .verif-demo {
+      background: var(--off); border-radius: 14px;
+      padding: 22px; box-shadow: var(--shadow2);
+    }
+    .verif-demo-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .verif-nota-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--navy); color: var(--gold);
+      font-family: var(--display); font-size: 1.3rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .verif-nota-txt strong { display: block; color: var(--navy); font-size: .9rem; }
+    .verif-nota-txt span   { font-size: .75rem; color: var(--gray); }
+    .verif-item { margin-bottom: 10px; }
+    .verif-item-top { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: .78rem; font-weight: 700; color: var(--navy); }
+    .verif-bar-bg   { background: var(--light); border-radius: 2px; height: 5px; }
+    .verif-bar-fill { border-radius: 2px; height: 5px; }
+
+    /*  Upsells  */
+    .upsells-section { background: var(--off); }
+    .upsell-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .upsell-card {
+      background: var(--white); border-radius: var(--r);
+      padding: 24px; box-shadow: var(--shadow2);
+      border-top: 3px solid var(--gold);
+      transition: transform var(--t);
+    }
+    .upsell-card:hover { transform: translateY(-3px); }
+    .upsell-icon { font-size: 1.6rem; margin-bottom: 12px; color: var(--navy); }
+    .upsell-card h4 { color: var(--navy); margin-bottom: 6px; font-family: var(--body); font-weight: 700; }
+    .upsell-card p  { font-size: .82rem; margin-bottom: 14px; }
+    .upsell-preco { font-family: var(--display); font-size: 1.2rem; font-weight: 700; color: var(--gold); }
+
+    /*  QR Code explainer  */
+    .qr-strip {
+      background: var(--navy); padding: 28px 0;
+    }
+    .qr-inner { display: flex; align-items: center; gap: 24px; }
+    .qr-box {
+      width: 72px; height: 72px; background: var(--white);
+      border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+    }
+    .qr-txt h4 { color: var(--white); font-family: var(--body); font-weight: 700; margin-bottom: 4px; }
+    .qr-txt p  { color: rgba(255,255,255,.55); font-size: .82rem; }
+
+    @media (max-width: 768px) {
+      .aval-grid        { grid-template-columns: 1fr; }
+      .ind-inner        { grid-template-columns: 1fr; }
+      .verif-inner      { grid-template-columns: 1fr; }
+      .upsell-grid      { grid-template-columns: 1fr; }
+      .qr-inner         { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#modelo">Modelo</a></li>
+        <li><a href="#indicacao">Indicar e Ganhar</a></li>
+        <li><a href="#precos">Preços</a></li>
+        <li><a href="pages/vagas.html">Vagas</a></li>
+        <li><a href="pages/editor.html" class="btn-nav">Criar agora</a></li>
+      </ul>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-badge">Simples · Profissional · Acessível</div>
+        <h1>Seu currículo<br><em>profissional</em><br>por <strong class="price-hl">R$2,50</strong></h1>
+        <p class="hero-desc">Preencha os dados, a IA organiza tudo, gere um PDF impecável e envie para empresas da sua cidade.</p>
+        <div class="hero-btns">
+          <a href="pages/modelos.html" class="btn-primary">
+            <i class="ph-bold ph-file-text"></i> Criar meu currículo
+          </a>
+          <a href="pages/verificador.html" class="btn-ghost">
+            <i class="ph ph-magnifying-glass"></i> Verificar currículo grátis
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>R$2,50</strong><span>por currículo</span></div>
+          <div class="stat-div"></div>
+          <div class="stat"><strong>4.9</strong><span>avaliação média</span></div>
+          <div class="stat-div"></div>
+          <div class="stat"><strong>PDF A4</strong><span>alta qualidade</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="cv-float" id="cvCard">
+          <div class="cvf-header">
+            <div class="cvf-avatar"><i class="ph ph-user" style="font-size:1.3rem;color:#D4AF37;opacity:.85"></i></div>
+            <div class="cvf-info">
+              <div class="cvf-bar-name"></div>
+              <div class="cvf-bar-role"></div>
+            </div>
+          </div>
+          <div class="cvf-divider"></div>
+          <div class="cvf-section">
+            <div class="cvf-label">Objetivo</div>
+            <div class="cvf-line long"></div>
+            <div class="cvf-line med"></div>
+          </div>
+          <div class="cvf-section">
+            <div class="cvf-label">Experiência</div>
+            <div class="cvf-exp"><div class="cvf-dot"></div><div><div class="cvf-line short gold"></div><div class="cvf-line long"></div><div class="cvf-line med"></div></div></div>
+            <div class="cvf-exp"><div class="cvf-dot"></div><div><div class="cvf-line short gold"></div><div class="cvf-line long"></div></div></div>
+          </div>
+          <div class="cvf-section">
+            <div class="cvf-label">Habilidades</div>
+            <div class="cvf-tags"><div class="cvf-tag"></div><div class="cvf-tag wide"></div><div class="cvf-tag"></div></div>
+          </div>
+          <div class="cvf-wm">formaprintbr.com.br</div>
+        </div>
+        <div class="hero-ring"></div>
+      </div>
+    </div>
+    <div class="hero-wave"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="#f8f7f4"/></svg></div>
+  </section>
+
+  <!-- VERIFICADOR GRÁTIS -->
+  <section class="section verificador-section" id="verificador">
+    <div class="container">
+      <div class="verif-inner">
+        <div class="verif-text">
+          <span class="sec-badge">100% gratuito</span>
+          <h2>Verifique seu currículo<br>antes de enviar</h2>
+          <p>Nossa IA analisa seu currículo atual e dá uma nota com sugestões específicas do que melhorar. Sem pagar nada.</p>
+          <div class="verif-features">
+            <div class="verif-feat"><i class="ph-bold ph-check"></i> Nota geral de 0 a 10</div>
+            <div class="verif-feat"><i class="ph-bold ph-check"></i> Análise de objetivo, experiências e habilidades</div>
+            <div class="verif-feat"><i class="ph-bold ph-check"></i> Sugestões específicas para melhorar</div>
+            <div class="verif-feat"><i class="ph-bold ph-check"></i> Funciona com qualquer currículo (cole o texto)</div>
+          </div>
+          <a href="pages/verificador.html" class="btn-primary">
+            <i class="ph-bold ph-magnifying-glass"></i> Verificar meu currículo grátis
+          </a>
+        </div>
+        <div class="verif-demo">
+          <div class="verif-demo-header">
+            <div class="verif-nota-circle">8.2</div>
+            <div class="verif-nota-txt">
+              <strong>Currículo Bom</strong>
+              <span>Pequenos ajustes para ficar perfeito</span>
+            </div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-item-top"><span>Objetivo Profissional</span><span style="color:#16a34a">9/10</span></div>
+            <div class="verif-bar-bg"><div class="verif-bar-fill" style="width:90%;background:#16a34a"></div></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-item-top"><span>Experiências</span><span style="color:#F59E0B">7/10</span></div>
+            <div class="verif-bar-bg"><div class="verif-bar-fill" style="width:70%;background:#F59E0B"></div></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-item-top"><span>Habilidades</span><span style="color:#16a34a">8/10</span></div>
+            <div class="verif-bar-bg"><div class="verif-bar-fill" style="width:80%;background:#16a34a"></div></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-item-top"><span>Formatação</span><span style="color:#EF4444">6/10</span></div>
+            <div class="verif-bar-bg"><div class="verif-bar-fill" style="width:60%;background:#EF4444"></div></div>
+          </div>
+          <div style="background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.78rem;color:var(--dark);line-height:1.6">
+            <strong style="color:var(--gold2)">Sugestão da IA:</strong> Adicione resultados concretos nas experiências. Ex: "Aumentei as vendas em 20%" ao invés de só "trabalhei com vendas".
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELO -->
+  <section class="section bg-off" id="modelo">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-badge">Modelo disponível</span>
+        <h2>Design que impressiona <em>qualquer recrutador</em></h2>
+      </div>
+      <div class="modelo-wrap">
+        <div class="modelo-preview-card">
+          <div class="modelo-preview">
+            <div class="mp-sidebar">
+              <div class="mp-avatar"></div>
+              <div class="mp-line white fat"></div>
+              <div class="mp-line white thin"></div>
+              <div style="height:10px"></div>
+              <div class="mp-line gold small"></div>
+              <div class="mp-line white xsmall"></div>
+              <div class="mp-line white xsmall"></div>
+              <div style="height:7px"></div>
+              <div class="mp-line gold small"></div>
+              <div class="mp-line white xsmall"></div>
+              <div class="mp-line white xsmall"></div>
+            </div>
+            <div class="mp-main">
+              <div class="mp-line navy small"></div>
+              <div class="mp-line gray long"></div>
+              <div class="mp-line gray med"></div>
+              <div class="mp-div gold"></div>
+              <div class="mp-line navy small" style="margin-top:7px"></div>
+              <div class="mp-line gray long"></div>
+              <div class="mp-line gray long"></div>
+              <div class="mp-line gray med"></div>
+              <div class="mp-div navy" style="margin-top:7px"></div>
+              <div class="mp-line navy small" style="margin-top:7px"></div>
+              <div class="mp-line gray long"></div>
+            </div>
+          </div>
+          <div class="modelo-overlay">
+            <a href="pages/editor.html" class="btn-overlay"><i class="ph-bold ph-pencil"></i> Usar este modelo</a>
+          </div>
+        </div>
+        <div class="modelo-info-col">
+          <div class="mi-badge">Modelo 01 — Disponível</div>
+          <h3>Clássico Dourado</h3>
+          <p>Navy com detalhes dourados. Personalizável em 12 paletas de cor e 5 fontes.</p>
+          <ul class="mi-features">
+            <li><i class="ph-bold ph-check"></i> Sidebar colorida com contato e habilidades</li>
+            <li><i class="ph-bold ph-check"></i> Foto 3×4 tirada na hora pela câmera</li>
+            <li><i class="ph-bold ph-check"></i> QR Code com perfil digital incluído</li>
+            <li><i class="ph-bold ph-check"></i> PDF em alta qualidade para impressão</li>
+            <li><i class="ph-bold ph-check"></i> IA melhora objetivo e experiências</li>
+          </ul>
+          <a href="pages/modelos.html" class="btn-primary">
+            <i class="ph-bold ph-file-text"></i> Criar com este modelo — R$2,50
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPSELLS -->
+  <section class="section upsells-section" id="extras">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-badge">Extras disponíveis</span>
+        <h2>Vai além do currículo</h2>
+      </div>
+      <div class="upsell-grid">
+        <div class="upsell-card">
+          <div class="upsell-icon"><i class="ph ph-envelope-open"></i></div>
+          <h4>Carta de Apresentação</h4>
+          <p>A IA gera uma carta personalizada para a vaga que você quer. Aumenta muito as chances de ser chamado.</p>
+          <div class="upsell-preco">+ R$1,00</div>
+        </div>
+        <div class="upsell-card">
+          <div class="upsell-icon"><i class="ph ph-translate"></i></div>
+          <h4>Currículo em Inglês</h4>
+          <p>A IA traduz e adapta seu currículo para o inglês profissional. Ideal para empresas multinacionais.</p>
+          <div class="upsell-preco">+ R$1,50</div>
+        </div>
+        <div class="upsell-card">
+          <div class="upsell-icon"><i class="ph ph-paper-plane-right"></i></div>
+          <h4>Envios Ilimitados</h4>
+          <p>Envie seu currículo para quantas empresas quiser durante 7 dias. Inclui acompanhamento de status.</p>
+          <div class="upsell-preco">+ R$1,00</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QR CODE STRIP -->
+  <div class="qr-strip">
+    <div class="container">
+      <div class="qr-inner">
+        <div class="qr-box"><i class="ph ph-qr-code" style="font-size:2.2rem;color:var(--navy)"></i></div>
+        <div class="qr-txt">
+          <h4>QR Code incluído em todo currículo</h4>
+          <p>O recrutador escaneia e acessa seu perfil digital completo com suas informações atualizadas. Diferencial que poucos currículos têm.</p>
+        </div>
+        <a href="pages/editor.html" class="btn-primary" style="flex-shrink:0">
+          <i class="ph-bold ph-arrow-right"></i> Criar agora
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDICAÇÃO -->
+  <section class="section indicacao-section" id="indicacao">
+    <div class="container">
+      <div class="ind-inner">
+        <div class="ind-text">
+          <span class="sec-badge light">Indicar e Ganhar</span>
+          <h2>Indique e ganhe<br>um currículo <em>grátis</em></h2>
+          <p>Compartilhe seu link único com amigos. Quando alguém comprar pelo seu link, você ganha um currículo completamente grátis.</p>
+          <div class="ind-steps">
+            <div class="ind-step">
+              <div class="ind-step-n">1</div>
+              <div class="ind-step-txt">
+                <strong>Compre seu currículo</strong>
+                <span>Você recebe seu link de indicação por email</span>
+              </div>
+            </div>
+            <div class="ind-step">
+              <div class="ind-step-n">2</div>
+              <div class="ind-step-txt">
+                <strong>Compartilhe no WhatsApp</strong>
+                <span>Manda para amigos, grupos de emprego, família</span>
+              </div>
+            </div>
+            <div class="ind-step">
+              <div class="ind-step-n">3</div>
+              <div class="ind-step-txt">
+                <strong>Ganhe currículo grátis</strong>
+                <span>Cada amigo que comprar = 1 crédito de currículo seu</span>
+              </div>
+            </div>
+          </div>
+          <a href="pages/indicacao.html" class="btn-primary">
+            <i class="ph-bold ph-share-network"></i> Ver meu link de indicação
+          </a>
+        </div>
+        <div class="ind-card">
+          <h3>Seu link de indicação</h3>
+          <p>Após comprar, você recebe um link como este para compartilhar:</p>
+          <div class="ind-link-box">formaprintbr.com.br/ref/<strong>seu-codigo</strong></div>
+          <div class="ind-share-btns">
+            <a href="pages/indicacao.html" class="btn-whats">
+              <i class="ph-bold ph-whatsapp-logo"></i> Compartilhar
+            </a>
+            <button class="btn-copy" onclick="copiarExemplo()">
+              <i class="ph ph-copy"></i> Copiar
+            </button>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--off);border-radius:8px;font-size:.78rem;color:var(--gray)">
+            Cada link comprado pelo seu link = <strong style="color:var(--navy)">R$2,50 de crédito</strong> na sua conta. Sem limite de indicações.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="section" id="como">
+    <div class="container">
+      <div class="sec-header"><h2>Como funciona</h2></div>
+      <div class="steps-row">
+        <div class="step"><div class="step-n">01</div><h4>Preencha os dados</h4><p>Stepper simples. IA ajuda em cada campo.</p></div>
+        <div class="step-arr"><i class="ph ph-arrow-right"></i></div>
+        <div class="step"><div class="step-n">02</div><h4>Pague R$2,50</h4><p>Pix ou cartão. Seguro via Mercado Pago.</p></div>
+        <div class="step-arr"><i class="ph ph-arrow-right"></i></div>
+        <div class="step"><div class="step-n">03</div><h4>Personalize</h4><p>Cores, fontes e layout do seu jeito.</p></div>
+        <div class="step-arr"><i class="ph ph-arrow-right"></i></div>
+        <div class="step"><div class="step-n">04</div><h4>Baixe e envie</h4><p>PDF A4 + envie para vagas com 1 clique.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREÇOS -->
+  <section class="section bg-off" id="precos">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-badge">Preços</span>
+        <h2>Cabe no bolso de <em>qualquer pessoa</em></h2>
+      </div>
+      <div class="fidelidade-strip">
+        <i class="ph ph-ticket" style="color:var(--gold);font-size:1.1rem"></i>
+        <span><strong>Cupom de fidelidade:</strong> Após comprar, você recebe um cupom por email. Na segunda compra, use o cupom e pague só R$1,50.</span>
+      </div>
+      <div class="precos-row">
+        <div class="preco-box">
+          <div class="pb-badge">Popular</div>
+          <h3>Individual</h3>
+          <div class="pb-valor">R$<span>2,50</span></div>
+          <div class="pb-sub">por currículo</div>
+          <ul class="pb-lista">
+            <li><i class="ph-bold ph-check"></i> PDF profissional A4</li>
+            <li><i class="ph-bold ph-check"></i> Foto 3×4 pela câmera</li>
+            <li><i class="ph-bold ph-check"></i> QR Code incluído</li>
+            <li><i class="ph-bold ph-check"></i> 5 envios para empresas</li>
+            <li><i class="ph-bold ph-check"></i> Link de indicação</li>
+          </ul>
+          <a href="pages/editor.html" class="btn-primary full">Começar agora</a>
+        </div>
+        <div class="preco-box destaque">
+          <div class="pb-badge gold">Melhor valor</div>
+          <h3>Pacote 3×</h3>
+          <div class="pb-valor">R$<span>5,00</span></div>
+          <div class="pb-sub">3 currículos · R$1,67 cada</div>
+          <ul class="pb-lista">
+            <li><i class="ph-bold ph-check"></i> Tudo do Individual</li>
+            <li><i class="ph-bold ph-check"></i> 3 versões diferentes</li>
+            <li><i class="ph-bold ph-check"></i> 15 envios para vagas</li>
+            <li><i class="ph-bold ph-check"></i> Válido por 30 dias</li>
+          </ul>
+          <a href="pages/editor.html" class="btn-primary full gold">Pegar o pacote</a>
+        </div>
+        <div class="preco-box muted">
+          <div class="pb-badge muted">Em breve</div>
+          <h3>Premium</h3>
+          <div class="pb-valor">R$<span>4,90</span></div>
+          <div class="pb-sub">design exclusivo</div>
+          <ul class="pb-lista">
+            <li><i class="ph-bold ph-check"></i> Modelo premium exclusivo</li>
+            <li><i class="ph-bold ph-check"></i> Carta de apresentação inclusa</li>
+            <li><i class="ph-bold ph-check"></i> Envios ilimitados</li>
+            <li><i class="ph-bold ph-check"></i> Suporte por WhatsApp</li>
+          </ul>
+          <button class="btn-ghost full" disabled>Em breve</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVALIAÇÕES -->
+  <section class="section avaliacoes" id="avaliacoes">
+    <div class="container">
+      <div class="sec-header">
+        <span class="sec-badge">Avaliações reais</span>
+        <h2>Quem usou e <em>conseguiu emprego</em></h2>
+      </div>
+      <div class="aval-media" id="avalMediaBanner" id="avalMediaBanner">
+        <div class="aval-media-num" id="avalMediaNum">—</div>
+        <div class="aval-media-info">
+          <div class="aval-media-stars"></div>
+          <div class="aval-media-txt" id="avalMediaInfo">Seja o primeiro a avaliar!</div>
+        </div>
+        <a href="pages/avaliacao.html" class="btn-aval">
+          <i class="ph ph-star"></i> Deixar minha avaliação
+        </a>
+      </div>
+      <div class="aval-grid" id="avalGrid">
+        <!-- Populadas via JS do localStorage + fixas -->
+      </div>
+    </div>
+  </section>
+
+  <!-- VAGAS CTA -->
+  <section class="section vagas-strip">
+    <div class="container">
+      <div class="vagas-strip-inner">
+        <div>
+          <span class="sec-badge light">Módulo de vagas</span>
+          <h2 style="color:var(--white);margin-top:8px">Envie para <em>empresas da sua cidade</em></h2>
+          <p style="color:rgba(255,255,255,.6);margin-bottom:28px">Busque vagas por cidade e cargo. Envie o PDF por email com um clique.</p>
+          <a href="pages/vagas.html" class="btn-primary"><i class="ph-bold ph-map-pin"></i> Buscar vagas</a>
+        </div>
+        <div class="vagas-card-mini">
+          <div class="vcm-header"><i class="ph ph-map-pin" style="color:var(--gold)"></i><div><div class="vcm-city">São Luís, MA</div><div class="vcm-count">23 vagas encontradas</div></div></div>
+          <div class="vcm-vaga"><div><strong>Auxiliar de Estoque</strong><div class="vcm-emp">Atacadão</div></div><span class="vcm-btn">Enviar</span></div>
+          <div class="vcm-vaga"><div><strong>Atendente</strong><div class="vcm-emp">Unimed MA</div></div><span class="vcm-btn">Enviar</span></div>
+          <div class="vcm-vaga"><div><strong>Operador de Caixa</strong><div class="vcm-emp">Supermercado Mateus</div></div><span class="vcm-btn">Enviar</span></div>
+          <div class="vcm-mais">+ 20 vagas disponíveis</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-final">
+    <div class="container">
+      <h2>Não deixe um currículo fraco<br>tirar uma vaga de você</h2>
+      <p>Em 5 minutos você tem um currículo profissional pronto para imprimir e enviar.</p>
+      <a href="pages/editor.html" class="btn-primary large">
+        <i class="ph-bold ph-file-arrow-up"></i> Criar meu currículo — R$2,50
+      </a>
+      <div class="cta-sub">Pagamento seguro via Mercado Pago · PDF na hora · Sem mensalidade</div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a href="index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+          <p>Currículos profissionais acessíveis para quem mais precisa.</p>
+          <a href="mailto:formaprintbr@gmail.com" style="color:rgba(255,255,255,.4);font-size:.82rem">formaprintbr@gmail.com</a>
+        </div>
+        <div class="footer-links">
+          <div class="footer-col">
+            <h4>Produto</h4>
+            <a href="#modelo">Modelo</a>
+            <a href="#precos">Preços</a>
+            <a href="#indicacao">Indicar e Ganhar</a>
+            <a href="pages/vagas.html">Vagas</a>
+            <a href="pages/verificador.html">Verificar currículo</a>
+          </div>
+          <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="mailto:formaprintbr@gmail.com">Contato</a>
+            <a href="pages/avaliacao.html">Avaliar</a>
+            <a href="#">Privacidade</a>
+            <a href="#">Termos</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 FormaPrint BR</span>
+        <span>Feito no Maranhão com orgulho</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    //  Avaliações: fixas + salvas pelos usuários 
+    
+    //  Avaliações: somente reais dos usuários 
+    const grid = document.getElementById('avalGrid');
+    let avalUsuarios = [];
+    try { avalUsuarios = JSON.parse(localStorage.getItem('fpbr_avaliacoes') || '[]'); } catch(e){}
+
+    // Calcular média real
+    const totalAval = avalUsuarios.length;
+    const mediaAval = totalAval > 0
+      ? (avalUsuarios.reduce((s,a) => s + (a.nota||5), 0) / totalAval).toFixed(1)
+      : null;
+
+    // Atualizar média no banner
+    const mediaEl = document.getElementById('avalMediaNum');
+    const mediaInfo = document.getElementById('avalMediaInfo');
+    if (mediaEl) {
+      if (totalAval > 0) {
+        mediaEl.textContent = mediaAval;
+        if (mediaInfo) mediaInfo.textContent = `Baseado em ${totalAval} avaliação(ões) reais`;
+      } else {
+        const avalBanner = document.getElementById('avalMediaBanner');
+        if (avalBanner) avalBanner.style.display = 'none';
+      }
+    }
+
+    if (totalAval === 0) {
+      grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);font-size:.9rem">Ainda não há avaliações. Seja o primeiro a avaliar!</div>';
+    } else {
+      avalUsuarios.slice().reverse().forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'aval-card';
+        const estrelas = ''.repeat(a.nota||5) + ''.repeat(5-(a.nota||5));
+        card.innerHTML = `
+          <div class="aval-stars">${estrelas}</div>
+          <p class="aval-texto">"${a.texto}"</p>
+          <div class="aval-autor">
+            <div class="aval-avatar" style="background:${a.cor||'#1B2A4A'}">${(a.nome||'U')[0].toUpperCase()}</div>
+            <div>
+              <div class="aval-nome">${a.nome}</div>
+              <div class="aval-cargo">${a.cargo||''}</div>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    </script>
+</body>
+</html>

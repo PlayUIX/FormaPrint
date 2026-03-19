@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indicar e Ganhar — FormaPrint BR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: var(--navy); min-height: 100vh; }
+
+    .ind-page { max-width: 640px; margin: 0 auto; padding: 100px 24px 60px; }
+
+    .ind-header { text-align: center; margin-bottom: 32px; }
+    .ind-header h1 { color: var(--white); font-size: clamp(1.8rem,4vw,2.6rem); margin-bottom: 10px; }
+    .ind-header p  { color: rgba(255,255,255,.6); font-size: .95rem; }
+
+    /* Card principal */
+    .ind-main-card {
+      background: var(--white); border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.3);
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .ind-card-top { background: var(--gold); padding: 20px 28px; display: flex; align-items: center; gap: 16px; }
+    .ind-card-top .val { font-family: var(--display); font-size: 2.2rem; font-weight: 900; color: var(--navy); line-height: 1; }
+    .ind-card-top .val-label { font-size: .8rem; font-weight: 700; color: var(--navy); opacity: .75; }
+    .ind-card-top .trophy { font-size: 2.5rem; margin-left: auto; }
+    .ind-card-body { padding: 24px 28px; }
+
+    .ind-link-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray); margin-bottom: 8px; }
+    .ind-link-box {
+      display: flex; align-items: center; gap: 0;
+      border: 2px solid var(--light); border-radius: 10px; overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .ind-link-txt {
+      flex: 1; padding: 11px 14px; font-size: .85rem;
+      color: var(--navy); font-family: monospace;
+      background: var(--off); word-break: break-all;
+      border: none; outline: none;
+    }
+    .ind-copy-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--navy); color: var(--white);
+      font-weight: 700; font-size: .8rem; padding: 11px 16px;
+      border: none; cursor: pointer; font-family: var(--body);
+      transition: background var(--t); white-space: nowrap;
+    }
+    .ind-copy-btn:hover { background: var(--navy2); }
+
+    .ind-share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .btn-share {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      font-weight: 700; font-size: .88rem; padding: 12px;
+      border-radius: 10px; border: none; cursor: pointer;
+      font-family: var(--body); transition: all var(--t);
+      text-decoration: none;
+    }
+    .btn-share.whats { background: #25D366; color: var(--white); }
+    .btn-share.whats:hover { background: #1aaa52; }
+    .btn-share.copy  { background: var(--off); border: 1.5px solid var(--light); color: var(--navy); }
+    .btn-share.copy:hover { background: var(--light); }
+
+    /* Contador de indicações */
+    .ind-counter {
+      display: flex; gap: 12px; margin-bottom: 20px;
+    }
+    .ind-count-box {
+      flex: 1; background: var(--off); border-radius: 10px;
+      padding: 14px; text-align: center;
+    }
+    .ind-count-num { font-family: var(--display); font-size: 1.8rem; font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+    .ind-count-lbl { font-size: .72rem; color: var(--gray); }
+
+    /* Como funciona */
+    .ind-how {
+      background: var(--off); border-radius: 12px;
+      padding: 18px; margin-bottom: 20px;
+    }
+    .ind-how-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray); margin-bottom: 14px; }
+    .ind-how-step  { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .ind-how-step:last-child { margin-bottom: 0; }
+    .ind-how-n {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--navy); color: var(--white);
+      font-size: .72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ind-how-txt strong { display: block; font-size: .85rem; color: var(--navy); margin-bottom: 2px; }
+    .ind-how-txt span   { font-size: .75rem; color: var(--gray); }
+
+    /* Card de usuário sem compra */
+    .sem-compra-card {
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px; padding: 24px; text-align: center;
+    }
+    .sem-compra-card h3 { color: var(--white); margin-bottom: 8px; font-size: 1.1rem; }
+    .sem-compra-card p  { color: rgba(255,255,255,.55); font-size: .85rem; margin-bottom: 20px; }
+
+    /* Histórico */
+    .ind-historico { background: var(--white); border-radius: 14px; overflow: hidden; }
+    .ind-hist-hd   { background: var(--off); padding: 14px 20px; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gray); }
+    .ind-hist-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--off); font-size: .85rem; }
+    .ind-hist-item .status-ok   { color: #16a34a; font-weight: 700; font-size: .78rem; }
+    .ind-hist-item .status-pend { color: var(--gray); font-size: .78rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar scrolled">
+    <div class="nav-inner">
+      <a href="../index.html" class="logo"><span class="logo-forma">Forma</span><span class="logo-print">Print</span><span class="logo-br"> BR</span></a>
+      <a href="editor.html" class="btn-nav" style="margin-left:auto">Criar currículo</a>
+    </div>
+  </nav>
+
+  <div class="ind-page" id="indPage">
+    <!-- Conteúdo gerado via JS -->
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    //  Gerar ou recuperar código de indicação 
+    let codigo = localStorage.getItem('fpbr_ref_code');
+    if (!codigo) {
+      // Gerar código único baseado em timestamp + random
+      codigo = Math.random().toString(36).substring(2, 8).toUpperCase();
+      localStorage.setItem('fpbr_ref_code', codigo);
+    }
+
+    const emailUsuario = localStorage.getItem('fpbr_email_usuario');
+    const temConta     = !!(emailUsuario && emailUsuario.includes('@'));
+    const emailUsuario = localStorage.getItem('fpbr_email_usuario');
+    const temConta     = !!(emailUsuario && emailUsuario.includes('@'));
+    const temCompra    = localStorage.getItem('fpbr_pago') === 'true';
+    const indicacoes   = JSON.parse(localStorage.getItem('fpbr_indicacoes') || '[]');
+    const creditosGanhos = indicacoes.filter(i => i.status === 'confirmado').length;
+    const pendentes      = indicacoes.filter(i => i.status === 'pendente').length;
+
+    const linkUrl  = `https://formaprintbr.com.br/ref/${codigo}`;
+    const msgWhats = encodeURIComponent(
+      `Ei! Fiz meu currículo no FormaPrint BR por só R$2,50 e ficou profissional demais!\n\nCria o seu pelo meu link e me ajuda também:\n${linkUrl}\n\n#FormaPrintBR`
+    );
+
+    const page = document.getElementById('indPage');
+
+    if (!temConta || !temCompra) {
+      // Usuário ainda não comprou
+      page.innerHTML = `
+        <div class="ind-header">
+          <h1>Indicar e Ganhar</h1>
+          <p>Compartilhe com amigos e ganhe currículos grátis</p>
+        </div>
+        <div class="sem-compra-card">
+          <i class="ph ph-lock-simple" style="font-size:2.5rem;color:rgba(255,255,255,.3);margin-bottom:16px;display:block"></i>
+          <h3>Crie sua conta e compre seu currículo</h3>
+          <p>Para ter seu link de indicação você precisa: (1) criar conta com email e (2) comprar seu primeiro currículo. Cada amigo que comprar pelo seu link = 1 currículo grátis para você.</p>
+          <a href="editor.html" class="btn-primary" style="display:inline-flex;margin:0 auto">
+            <i class="ph-bold ph-file-text"></i> Criar meu currículo — R$2,50
+          </a>
+          <div style="margin-top:16px;font-size:.78rem;color:rgba(255,255,255,.3)">Sem compra necessária para ver como funciona abaixo</div>
+        </div>
+        <div style="margin-top:24px">
+          <div class="ind-how">
+            <div class="ind-how-title">Como funciona</div>
+            <div class="ind-how-step"><div class="ind-how-n">1</div><div class="ind-how-txt"><strong>Compre seu currículo (R$2,50)</strong><span>Você recebe seu link único de indicação</span></div></div>
+            <div class="ind-how-step"><div class="ind-how-n">2</div><div class="ind-how-txt"><strong>Compartilhe no WhatsApp</strong><span>Manda para grupos de emprego, amigos, família</span></div></div>
+            <div class="ind-how-step"><div class="ind-how-n">3</div><div class="ind-how-txt"><strong>Cada compra = 1 currículo grátis</strong><span>O crédito aparece automaticamente na sua conta</span></div></div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Usuário já comprou — mostrar painel completo
+      page.innerHTML = `
+        <div class="ind-header">
+          <h1>Seu painel de indicação</h1>
+          <p>Compartilhe e ganhe currículos grátis para você</p>
+        </div>
+
+        <div class="ind-main-card">
+          <div class="ind-card-top">
+            <div>
+              <div class="val">${creditosGanhos}</div>
+              <div class="val-label">currículos grátis ganhos</div>
+            </div>
+            <div class="trophy"><i class="ph ph-trophy" style="color:var(--navy)"></i></div>
+          </div>
+          <div class="ind-card-body">
+
+            <div class="ind-counter">
+              <div class="ind-count-box">
+                <div class="ind-count-num">${indicacoes.length}</div>
+                <div class="ind-count-lbl">links compartilhados</div>
+              </div>
+              <div class="ind-count-box">
+                <div class="ind-count-num" style="color:#16a34a">${creditosGanhos}</div>
+                <div class="ind-count-lbl">compras confirmadas</div>
+              </div>
+              <div class="ind-count-box">
+                <div class="ind-count-num" style="color:var(--gold)">${pendentes}</div>
+                <div class="ind-count-lbl">pendentes</div>
+              </div>
+            </div>
+
+            <div class="ind-link-label">Seu link de indicação</div>
+            <div class="ind-link-box">
+              <input class="ind-link-txt" id="linkInput" value="${linkUrl}" readonly>
+              <button class="ind-copy-btn" onclick="copiar()">
+                <i class="ph ph-copy"></i> Copiar
+              </button>
+            </div>
+
+            <div class="ind-share-grid">
+              <a href="https://wa.me/?text=${msgWhats}" target="_blank" class="btn-share whats">
+                <i class="ph-bold ph-whatsapp-logo"></i> Compartilhar no WhatsApp
+              </a>
+              <button class="btn-share copy" onclick="copiar()">
+                <i class="ph ph-copy"></i> Copiar link
+              </button>
+            </div>
+
+            <div class="ind-how">
+              <div class="ind-how-title">Lembre os amigos</div>
+              <div class="ind-how-step"><div class="ind-how-n">1</div><div class="ind-how-txt"><strong>Mande o link pelo WhatsApp</strong><span>Grupos de emprego da sua cidade funcionam muito bem</span></div></div>
+              <div class="ind-how-step"><div class="ind-how-n">2</div><div class="ind-how-txt"><strong>Amigo compra pelo seu link</strong><span>Aparece automaticamente como confirmado aqui</span></div></div>
+              <div class="ind-how-step"><div class="ind-how-n">3</div><div class="ind-how-txt"><strong>Você ganha crédito de currículo</strong><span>Use o código GRATIS-${codigo} na hora de pagar</span></div></div>
+            </div>
+
+          </div>
+        </div>
+
+        ${indicacoes.length > 0 ? `
+        <div class="ind-historico">
+          <div class="ind-hist-hd">Histórico de indicações</div>
+          ${indicacoes.map(i => `
+            <div class="ind-hist-item">
+              <div>
+                <strong style="font-size:.85rem;color:var(--navy)">${i.nome||'Amigo indicado'}</strong>
+                <div style="font-size:.72rem;color:var(--gray)">${i.data||''}</div>
+              </div>
+              <span class="${i.status==='confirmado'?'status-ok':'status-pend'}">
+                ${i.status==='confirmado' ? 'Confirmado — crédito ganho' : 'Pendente'}
+              </span>
+            </div>
+          `).join('')}
+        </div>` : ''}
+      `;
+    }
+
+    function copiar() {
+      navigator.clipboard.writeText(linkUrl).then(() => {
+        toast('Link copiado!', 'success');
+        // Simular registro de compartilhamento
+        const inds = JSON.parse(localStorage.getItem('fpbr_indicacoes') || '[]');
+      });
+    }
+
+    // Verificar se alguém veio por um link de ref
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode   = urlParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('fpbr_veio_de_ref', refCode);
+    }
+
+    function toast(msg, tipo='') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + tipo;
+      void t.offsetWidth; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>
